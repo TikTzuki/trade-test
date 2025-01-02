@@ -38,7 +38,7 @@ message CreateBankAccountRequest {
 }
 
 message CreateBankAccountResponse {
-  BankAccountData bankAccount = 1;
+  string bankAccount = 1;
 }
 
 message GetBankAccountByIdRequest {

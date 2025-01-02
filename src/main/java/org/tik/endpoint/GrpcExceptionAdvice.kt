@@ -1,4 +1,4 @@
-package org.tik.bank
+package org.tik.endpoint
 
 import io.grpc.Status
 import io.grpc.StatusException

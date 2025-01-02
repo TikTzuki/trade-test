@@ -8,3 +8,11 @@ grpc:
 spring:
   main:
     web-application-type: none
+  cassandra:
+    local-datacenter: dc1
+    port: 31646
+    keyspace-name: wallet
+    username: cluster1-superuser
+    password: t72v7ioLWEfo7fPbiWfjO1YZ2NWoxxAjLuQaqNdNA8wSbFKicPirjA
+    contact-points: 10.8.0.7
+    schema-action: create_if_not_exists

@@ -1,4 +1,4 @@
-package org.tik.bank;
+package org.tik.endpoint;
 
 import com.tik.grpc.bank.service.Bank.CreateBankAccountRequest;
 import com.tik.grpc.bank.service.Bank.CreateBankAccountResponse;
@@ -8,6 +8,7 @@ import com.tik.grpc.bank.service.ReactorBankAccountServiceGrpc;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.tik.bank.BankAccountService;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -22,9 +23,9 @@ public class BackAccountGrpcService extends ReactorBankAccountServiceGrpc.BankAc
     @Override
     public Mono<CreateBankAccountResponse> createBankAccount(Mono<CreateBankAccountRequest> request) {
         return request.flatMap(req -> bankAccountService.createBankAccount(MapperKt.of(req))
-                        .doOnNext(v -> log.debug("span req {}", req.toString())))
+                        .doOnNext(v -> log.debug("span req {}", req)))
                 .map(bankAccount -> CreateBankAccountResponse.newBuilder()
-                        .setBankAccount(MapperKt.toGrpc(bankAccount))
+                        .setBankAccount(bankAccount.toString())
                         .build())
                 .timeout(Duration.ofMillis(TIMEOUT_MILLIS))
                 .doOnError(ex -> {

@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public interface BankAccountService {
-    Mono<BankAccount> createBankAccount(BankAccount bankAccount);
+    Mono<UUID> createBankAccount(BankAccount bankAccount);
 
     Mono<BankAccount> getBankAccountById(UUID id);
 

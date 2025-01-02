@@ -1,19 +1,26 @@
 package org.tik.bank.impl;
 
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.tik.bank.BankAccount;
+import org.tik.bank.BankAccountRepository;
 import org.tik.bank.BankAccountService;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class BankAccountServiceImpl implements BankAccountService {
+    final BankAccountRepository repository;
+
     @Override
-    public Mono<BankAccount> createBankAccount(BankAccount bankAccount) {
-        return Mono.empty();
+    public Mono<UUID> createBankAccount(BankAccount bankAccount) {
+        return repository.insertLite(bankAccount);
     }
 
     @Override
