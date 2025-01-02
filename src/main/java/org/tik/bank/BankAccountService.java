@@ -1,5 +1,10 @@
 package org.tik.bank;
 
+import reactor.core.publisher.Mono;
+
+import java.math.BigDecimal;
+import java.util.UUID;
+
 public interface BankAccountService {
     Mono<BankAccount> createBankAccount(BankAccount bankAccount);
 
@@ -9,7 +14,7 @@ public interface BankAccountService {
 
     Mono<BankAccount> withdrawAmount(UUID id, BigDecimal amount);
 
-    Flux<BankAccount> findBankAccountByBalanceBetween(FindByBalanceRequestDto request);
-
-    Mono<Page<BankAccount>> findAllBankAccountsByBalance(FindByBalanceRequestDto request);
+//    Flux<BankAccount> findBankAccountByBalanceBetween(FindByBalanceRequestDto request);
+//
+//    Mono<Page<BankAccount>> findAllBankAccountsByBalance(FindByBalanceRequestDto request);
 }

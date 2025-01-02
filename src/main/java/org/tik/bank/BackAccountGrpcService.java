@@ -1,10 +1,13 @@
 package org.tik.bank;
 
-import com.example.grpc.bank.service.Bank;
-import com.example.grpc.bank.service.ReactorBankAccountServiceGrpc;
+import com.tik.grpc.bank.service.Bank.CreateBankAccountRequest;
+import com.tik.grpc.bank.service.Bank.CreateBankAccountResponse;
+import com.tik.grpc.bank.service.Bank.GetBankAccountByIdRequest;
+import com.tik.grpc.bank.service.Bank.GetBankAccountByIdResponse;
+import com.tik.grpc.bank.service.ReactorBankAccountServiceGrpc;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.grpc.server.service.GrpcService;
+import net.devh.boot.grpc.server.service.GrpcService;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -13,36 +16,41 @@ import java.time.Duration;
 @GrpcService
 @RequiredArgsConstructor
 public class BackAccountGrpcService extends ReactorBankAccountServiceGrpc.BankAccountServiceImplBase {
-    private final BankAccountService bankAccountService;
-    private final Tracer tracer;
     private static final Long TIMEOUT_MILLIS = 5000L;
-    private final Validator validator;
+    private final BankAccountService bankAccountService;
 
     @Override
-    public Mono<Bank.CreateBankAccountResponse> createBankAccount(Mono<Bank.CreateBankAccountRequest> request) {
-        return request.flatMap(req -> bankAccountService.createBankAccount(validate(BankAccountMapper.of(req)))
-                        .doOnNext(v -> spanTag("req", req.toString())))
-                .map(bankAccount -> Bank.CreateBankAccountResponse.newBuilder()
-                        .setBankAccount(BankAccountMapper.toGrpc(bankAccount))
+    public Mono<CreateBankAccountResponse> createBankAccount(Mono<CreateBankAccountRequest> request) {
+        return request.flatMap(req -> bankAccountService.createBankAccount(MapperKt.of(req))
+                        .doOnNext(v -> log.debug("span req {}", req.toString())))
+                .map(bankAccount -> CreateBankAccountResponse.newBuilder()
+                        .setBankAccount(MapperKt.toGrpc(bankAccount))
                         .build())
                 .timeout(Duration.ofMillis(TIMEOUT_MILLIS))
-                .doOnError(this::spanError)
+                .doOnError(ex -> {
+                    log.error(ex.getMessage(), ex);
+                })
                 .doOnSuccess(result -> log.info("created account: {}", result.getBankAccount()));
     }
 
-    private <T> T validate(T data) {
-        var errors = validator.validate(data);
-        if (!errors.isEmpty()) throw new ConstraintViolationException(errors);
-        return data;
+    @Override
+    public Mono<GetBankAccountByIdResponse> getBankAccountById(Mono<GetBankAccountByIdRequest> request) {
+        return Mono.just(GetBankAccountByIdResponse.newBuilder()
+                .build());
     }
-
-    private void spanTag(String key, String value) {
-        var span = tracer.currentSpan();
-        if (span != null) span.tag(key, value);
-    }
-
-    private void spanError(Throwable ex) {
-        var span = tracer.currentSpan();
-        if (span != null) span.error(ex);
-    }
+    //    private <T> T validate(T data) {
+//        var errors = validator.validate(data);
+//        if (!errors.isEmpty()) throw new ConstraintViolationException(errors);
+//        return data;
+//    }
+//
+//    private void spanTag(String key, String value) {
+//        var span = tracer.currentSpan();
+//        if (span != null) span.tag(key, value);
+//    }
+//
+//    private void spanError(Throwable ex) {
+//        var span = tracer.currentSpan();
+//        if (span != null) span.error(ex);
+//    }
 }

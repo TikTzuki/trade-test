@@ -1,15 +1,11 @@
 package org.tik
 
-import io.grpc.netty.NettyServerBuilder
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
+
+@SpringBootApplication
+class Main
 
 fun main(args: Array<String>) {
-    val port = if (args.isNotEmpty()) Integer.parseInt(args[0]) else 8080
-
-    val server = NettyServerBuilder
-        .forPort(port)
-        .build();
-
-    server.start();
-
-    server.awaitTermination();
+    runApplication<Main>(*args)
 }
