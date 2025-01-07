@@ -32,7 +32,7 @@ public class Main {
                         .content(List.of(CompletionBuilder.ContentBuilder.build(Type.TEXT, line)))
                         .build()
                 );
-                String respMessage= CompletionBuilder.builder()
+                String respMessage = CompletionBuilder.builder()
                         .apiKey(apiKey)
                         .body(CompletionBuilder.Body.builder()
                                 .model(model)

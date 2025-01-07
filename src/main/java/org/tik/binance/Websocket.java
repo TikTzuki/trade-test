@@ -14,6 +14,26 @@ public class Websocket {
         test();
     }
 
+    public static void test() throws InterruptedException {
+        SignatureGenerator signatureGenerator = new MyRsaSig("id_rsa");
+        WebSocketApiClient wsApiClient = new WebSocketApiClientImpl("ljWwvXmOoE4RmkmEbCNHJn6cnO67fRaVidugZT1cephKYaJzE5YWyTTDW7tCglHX", signatureGenerator);
+
+        wsApiClient.connect(((message) -> {
+            System.out.println(message);
+        }));
+
+        JSONObject optionalParams = new JSONObject();
+        optionalParams.put("requestId", "request123");
+        optionalParams.put("quantity", 1);
+
+//        wsApiClient.trade().testNewOrder("BTCUSDT", "BUY", "MARKET", optionalParams);
+        wsApiClient.trade().getOrder("ETHUSDT", new JSONObject());
+
+        Thread.sleep(1_000);
+
+        wsApiClient.close();
+    }
+
     public void test1() throws InterruptedException {
         WebSocketStreamClient wsClient = new WebSocketStreamClientImpl();
 
@@ -40,25 +60,5 @@ public class Websocket {
         wsClient.closeAllConnections();
 
 
-    }
-
-    public static void test() throws InterruptedException {
-        SignatureGenerator signatureGenerator = new MyRsaSig("id_rsa");
-        WebSocketApiClient wsApiClient = new WebSocketApiClientImpl("ljWwvXmOoE4RmkmEbCNHJn6cnO67fRaVidugZT1cephKYaJzE5YWyTTDW7tCglHX", signatureGenerator);
-
-        wsApiClient.connect(((message) -> {
-            System.out.println(message);
-        }));
-
-        JSONObject optionalParams = new JSONObject();
-        optionalParams.put("requestId", "request123");
-        optionalParams.put("quantity", 1);
-
-//        wsApiClient.trade().testNewOrder("BTCUSDT", "BUY", "MARKET", optionalParams);
-        wsApiClient.trade().getOrder("ETHUSDT", new JSONObject());
-
-        Thread.sleep(1_000);
-
-        wsApiClient.close();
     }
 }

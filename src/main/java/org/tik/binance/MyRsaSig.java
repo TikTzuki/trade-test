@@ -19,10 +19,10 @@ import java.util.Base64;
 public class MyRsaSig implements SignatureGenerator {
     private static final String RSA_SHA256 = "SHA256withRSA";
     private static final String RSA = "RSA";
-    private RSAPrivateKey privateKey;
+    private final RSAPrivateKey privateKey;
 
     public MyRsaSig(String privateKey) {
-        this(privateKey, (String)null);
+        this(privateKey, null);
     }
 
     public MyRsaSig(String privateKey, String password) {
@@ -74,6 +74,6 @@ public class MyRsaSig implements SignatureGenerator {
         }
 
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        return (RSAPrivateKey)kf.generatePrivate(encodedKeySpec);
+        return (RSAPrivateKey) kf.generatePrivate(encodedKeySpec);
     }
 }

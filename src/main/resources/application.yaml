@@ -1,6 +1,7 @@
 logging:
   level:
     web: debug
+    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: debug
 grpc:
   server:
     port: 9090
@@ -9,10 +10,14 @@ spring:
   main:
     web-application-type: none
   cassandra:
-    local-datacenter: dc1
-    port: 31646
-    keyspace-name: wallet
-    username: cluster1-superuser
-    password: t72v7ioLWEfo7fPbiWfjO1YZ2NWoxxAjLuQaqNdNA8wSbFKicPirjA
-    contact-points: 10.8.0.7
+    #    local-datacenter: dc1
+    #    port: 31646
+    keyspace-name: nio_lab
+    #    username: cluster1-superuser
+    #    password: Nt72v7ioLWEfo7fPbiWfjO1YZ2NWoxxAjLuQaqNdNA8wSbFKicPirjA
+    #    contact-points: 10.8.0.7
     schema-action: create_if_not_exists
+    config: application.conf
+  threads:
+    virtual:
+      enabled: true

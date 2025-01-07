@@ -20,7 +20,7 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public Mono<UUID> createBankAccount(BankAccount bankAccount) {
-        return repository.insertLite(bankAccount);
+        return repository.insert(bankAccount).map(BankAccount::getId);
     }
 
     @Override
