@@ -1,7 +1,3 @@
-logging:
-  level:
-    web: debug
-    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: debug
 grpc:
   server:
     port: 9090
@@ -17,7 +13,11 @@ spring:
     #    password: Nt72v7ioLWEfo7fPbiWfjO1YZ2NWoxxAjLuQaqNdNA8wSbFKicPirjA
     #    contact-points: 10.8.0.7
     schema-action: create_if_not_exists
-    config: application.conf
+    config: keyspaces-application.conf
   threads:
     virtual:
       enabled: true
+logging:
+  level:
+    web: debug
+    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: info

@@ -4,8 +4,10 @@ package com.tik.grpc.bank.service;
 
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 service BankAccountService {
+  rpc ping (stream google.protobuf.Empty) returns (stream google.protobuf.StringValue);
   rpc createBankAccount (CreateBankAccountRequest) returns (CreateBankAccountResponse);
   rpc getBankAccountById (GetBankAccountByIdRequest) returns (GetBankAccountByIdResponse);
   rpc depositBalance (DepositBalanceRequest) returns (DepositBalanceResponse);

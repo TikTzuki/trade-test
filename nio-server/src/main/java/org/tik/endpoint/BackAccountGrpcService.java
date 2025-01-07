@@ -1,5 +1,7 @@
 package org.tik.endpoint;
 
+import com.google.protobuf.Empty;
+import com.google.protobuf.StringValue;
 import com.tik.grpc.bank.service.Bank.CreateBankAccountRequest;
 import com.tik.grpc.bank.service.Bank.CreateBankAccountResponse;
 import com.tik.grpc.bank.service.Bank.GetBankAccountByIdRequest;
@@ -9,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.tik.bank.BankAccountService;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -19,6 +22,14 @@ import java.time.Duration;
 public class BackAccountGrpcService extends ReactorBankAccountServiceGrpc.BankAccountServiceImplBase {
     private static final Long TIMEOUT_MILLIS = 5000L;
     private final BankAccountService bankAccountService;
+
+    @Override
+    public Flux<StringValue> ping(Flux<Empty> request) {
+        return request.map(req -> StringValue.newBuilder()
+                        .setValue("pong")
+                        .build())
+                .timeout(Duration.ofMillis(TIMEOUT_MILLIS));
+    }
 
     @Override
     public Mono<CreateBankAccountResponse> createBankAccount(Mono<CreateBankAccountRequest> request) {

@@ -1,5 +1,4 @@
 ext {
-    def reactiveGrpcVersion = '1.2.4'
     project(":nio-server") {
         dependencies {
             // Kotlin
@@ -24,14 +23,41 @@ ext {
             implementation "com.google.protobuf:protoc:3.24.0"
             implementation 'net.devh:grpc-server-spring-boot-starter:3.1.0.RELEASE'
 
-            implementation "com.salesforce.servicelibs:reactor-grpc-stub:${reactiveGrpcVersion}"
-            implementation 'org.springframework.grpc:spring-grpc-core'
+            implementation "com.salesforce.servicelibs:reactor-grpc-stub:1.2.4"
+//            implementation 'org.springframework.grpc:spring-grpc-core'
 
             // Test
             testImplementation "org.junit.jupiter:junit-jupiter"
             testImplementation "org.testng:testng:7.10.2"
         }
-
-
+        dependencyManagement {
+            imports {
+                mavenBom "org.springframework.grpc:spring-grpc-dependencies:0.3.0-SNAPSHOT"
+                mavenBom "org.junit:junit-bom:5.10.0"
+            }
+        }
+        def reactiveGrpcVersion = '1.2.4'
+        protobuf {
+            protoc {
+                artifact = 'com.google.protobuf:protoc'
+            }
+            plugins {
+                grpc {
+                    artifact = 'io.grpc:protoc-gen-grpc-java'
+                }
+                reactor {
+                    artifact = "com.salesforce.servicelibs:reactor-grpc:${reactiveGrpcVersion}"
+                }
+            }
+            generateProtoTasks {
+                all()*.plugins {
+                    grpc {
+                        option 'jakarta_omit'
+                        option '@generated=omit'
+                    }
+                    reactor {}
+                }
+            }
+        }
     }
 }
