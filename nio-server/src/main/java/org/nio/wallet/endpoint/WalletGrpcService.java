@@ -7,10 +7,12 @@ import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountRequest;
 import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountResponse;
 import com.nio.wallet.grpc.WalletServiceOuterClass.GetAccountByIdRequest;
 import com.nio.wallet.grpc.WalletServiceOuterClass.GetAccountByIdResponse;
+import com.nio.wallet.grpc.WalletServiceOuterClass.WithdrawRequest;
+import com.nio.wallet.grpc.WalletServiceOuterClass.WithdrawResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.nio.wallet.account.BankAccountService;
+import org.nio.wallet.account.AccountService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -19,9 +21,9 @@ import java.time.Duration;
 @Slf4j
 @GrpcService
 @RequiredArgsConstructor
-public class BackAccountGrpcService extends ReactorWalletServiceGrpc.WalletServiceImplBase {
+public class WalletGrpcService extends ReactorWalletServiceGrpc.WalletServiceImplBase {
     private static final Long TIMEOUT_MILLIS = 5000L;
-    private final BankAccountService bankAccountService;
+    private final AccountService bankAccountService;
 
     @Override
     public Flux<StringValue> ping(Flux<Empty> request) {
@@ -36,7 +38,7 @@ public class BackAccountGrpcService extends ReactorWalletServiceGrpc.WalletServi
         return request.flatMap(req -> bankAccountService.createBankAccount(MapperKt.of(req))
                         .doOnNext(v -> log.debug("span req {}", req)))
                 .map(bankAccount -> CreateAccountResponse.newBuilder()
-                        .setAccountId(bankAccount.toString())
+                        .setAccountId(bankAccount)
                         .build())
                 .timeout(Duration.ofMillis(TIMEOUT_MILLIS))
                 .doOnError(ex -> {
@@ -48,6 +50,14 @@ public class BackAccountGrpcService extends ReactorWalletServiceGrpc.WalletServi
     @Override
     public Mono<GetAccountByIdResponse> getAccountById(Mono<GetAccountByIdRequest> request) {
         return Mono.just(GetAccountByIdResponse.newBuilder()
+                .build());
+    }
+
+    @Override
+    public Mono<WithdrawResponse> withdraw(Mono<WithdrawRequest> request) {
+        return request.map(req -> {
+            return req;
+        }).map(req -> WithdrawResponse.newBuilder()
                 .build());
     }
     //    private <T> T validate(T data) {

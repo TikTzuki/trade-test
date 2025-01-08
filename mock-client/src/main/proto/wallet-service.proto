@@ -10,8 +10,8 @@ service WalletService {
   rpc ping (stream google.protobuf.Empty) returns (stream google.protobuf.StringValue);
   rpc createAccount (CreateAccountRequest) returns (CreateAccountResponse);
   rpc getAccountById (GetAccountByIdRequest) returns (GetAccountByIdResponse);
-  rpc depositBalance (DepositBalanceRequest) returns (DepositBalanceResponse);
-  rpc withdrawBalance (WithdrawBalanceRequest) returns (WithdrawBalanceResponse);
+  rpc deposit (DepositRequest) returns (DepositResponse);
+  rpc withdraw (WithdrawRequest) returns (WithdrawResponse);
   rpc getAllByBalance (GetAllByBalanceRequest) returns (stream GetAllByBalanceResponse);
   rpc getAllByBalanceWithPagination(GetAllByBalanceWithPaginationRequest) returns (GetAllByBalanceWithPaginationResponse);
 }
@@ -51,21 +51,21 @@ message GetAccountByIdResponse {
   AccountData account = 1;
 }
 
-message DepositBalanceRequest {
+message DepositRequest {
   string id = 1;
   double balance = 2;
 }
 
-message DepositBalanceResponse {
+message DepositResponse {
   AccountData account = 1;
 }
 
-message WithdrawBalanceRequest {
+message WithdrawRequest {
   string id = 1;
   double balance = 2;
 }
 
-message WithdrawBalanceResponse {
+message WithdrawResponse {
   AccountData account = 1;
 }
 

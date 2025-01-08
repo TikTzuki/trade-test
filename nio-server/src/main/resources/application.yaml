@@ -20,4 +20,4 @@ spring:
 logging:
   level:
     web: debug
-    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: info
+    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: debug
