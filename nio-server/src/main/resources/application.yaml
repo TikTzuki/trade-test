@@ -19,5 +19,6 @@ spring:
       enabled: true
 logging:
   level:
-    web: debug
-    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: debug
+    web: error
+    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: error
+    root: error

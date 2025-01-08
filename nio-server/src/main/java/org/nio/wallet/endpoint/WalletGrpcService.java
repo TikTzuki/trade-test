@@ -13,17 +13,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.nio.wallet.account.AccountService;
+import org.nio.wallet.transaction.TransactionService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
+import static com.nio.wallet.grpc.WalletServiceOuterClass.CloseTicketRequest;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.CloseTicketResponse;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.TransferRequest;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.TransferResponse;
+
 @Slf4j
 @GrpcService
 @RequiredArgsConstructor
 public class WalletGrpcService extends ReactorWalletServiceGrpc.WalletServiceImplBase {
-    private static final Long TIMEOUT_MILLIS = 5000L;
-    private final AccountService bankAccountService;
+    private static final Long TIMEOUT_MILLIS = 5_000L;
+    final AccountService bankAccountService;
+    final TransactionService transactionService;
 
     @Override
     public Flux<StringValue> ping(Flux<Empty> request) {
@@ -44,7 +51,24 @@ public class WalletGrpcService extends ReactorWalletServiceGrpc.WalletServiceImp
                 .doOnError(ex -> {
                     log.error(ex.getMessage(), ex);
                 })
-                .doOnSuccess(result -> log.info("created account: {}", result.getAccountId()));
+                .doOnSuccess(result -> log.debug("created account: {}", result.getAccountId()));
+    }
+
+    @Override
+    public Mono<TransferResponse> transfer(Mono<TransferRequest> request) {
+        return request.flatMap(transactionService::transfer)
+                .map(newTran -> TransferResponse.newBuilder()
+                        .build())
+                .timeout(Duration.ofMillis(TIMEOUT_MILLIS))
+                .doOnError(ex -> {
+                    log.error(ex.getMessage(), ex);
+                })
+                .doOnSuccess(result -> log.debug("transfer: {}", result));
+    }
+
+    @Override
+    public Mono<CloseTicketResponse> closeTicket(Mono<CloseTicketRequest> request) {
+        return Mono.empty();
     }
 
     @Override
