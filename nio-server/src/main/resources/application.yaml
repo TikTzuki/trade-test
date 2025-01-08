@@ -19,6 +19,6 @@ spring:
       enabled: true
 logging:
   level:
-    web: error
+    web: warn
     org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: error
-    root: error
+    root: warn

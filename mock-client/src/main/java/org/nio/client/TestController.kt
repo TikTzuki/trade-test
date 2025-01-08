@@ -2,20 +2,22 @@ package org.nio.client
 
 import com.google.protobuf.Empty
 import com.nio.wallet.grpc.ReactorWalletServiceGrpc.ReactorWalletServiceStub
-import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountRequest
-import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountResponse
+import com.nio.wallet.grpc.WalletServiceOuterClass.*
 import net.devh.boot.grpc.client.inject.GrpcClient
-import org.nio.client.utils.readCsvFile
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.buffer.DataBuffer
+import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.core.io.buffer.DefaultDataBufferFactory
+import org.springframework.core.task.VirtualThreadTaskExecutor
 import org.springframework.http.ContentDisposition
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
+import reactor.kotlin.core.publisher.toFlux
 
 val TRANSFER_RANGE = listOf("1", "5", "10")
 
@@ -72,37 +74,38 @@ class TestController @Autowired constructor(
             .body(bufferFlux)
     }
 
-    @PostMapping("/bulk-transfers")
+    @PostMapping("/bulk-transfers", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun bulkTransfers(
-        @RequestParam number: Int,
-        @RequestPart("file") fileFlux: Flux<MultipartFile>
+        @RequestParam userCount: Long,
+        @RequestParam transactionPerUser: Int,
+        @RequestPart("file")
+        fileFlux: FilePart
     ): String {
-        fileFlux.flatMap {
-            readCsvFile(it)
-//                .flatMap { it ->
-//                    return@flatMap stub.transfer(
-//                        Mono.just(
-//                            TransferRequest.newBuilder()
-//                                .setUserId(it[0])
-//                                .setAmount(TRANSFER_RANGE.random())
-//                                .build()
-//                        )
-//                    )
-//                }
-        }.subscribe()
-//        val reqFlux = Flux.generate({ 0 }, { state, sink ->
-//            if (state < number) {
-//                sink.next(CreateAccountRequest.newBuilder().build())
-//                state + 1
-//            } else {
-//                sink.complete()
-//                state
-//            }
-//        }).flatMap {
-//            val resp: Mono<CreateAccountResponse> = stub.createAccount(Mono.just(it))
-//            return@flatMap resp
-//        }
-//        reqFlux.subscribe { println(it) }
+        val accountIds: List<String> = DataBufferUtils.join(fileFlux.content())
+            .map { buffer ->
+                buffer.asInputStream(true)
+                    .bufferedReader().use { reader ->
+                        reader.readLines()
+                    }
+            }.block()!!
+        var i = 0
+        accountIds.toFlux()
+            .skip(userCount)
+            .parallel(10)
+            .runOn(Schedulers.fromExecutor(VirtualThreadTaskExecutor("bulk-transfer")))
+            .flatMap { accountId ->
+                i++
+                if (i % 50_000 == 0)
+                    println(i)
+                return@flatMap stub.transfer(
+                    Mono.just(
+                        TransferRequest.newBuilder()
+                            .setUserId(accountId)
+                            .setAmount(TRANSFER_RANGE.random())
+                            .build()
+                    )
+                )
+            }.subscribe { }
         return "Hello, World!"
     }
 

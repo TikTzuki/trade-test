@@ -4,9 +4,6 @@ spring:
   threads:
     virtual:
       enabled: true
-logging:
-  level:
-    web: debug
 grpc:
   client:
     bank-account-service:
@@ -14,3 +11,6 @@ grpc:
       negotiation-type: plaintext
 server:
   port: 8080
+logging:
+  level:
+    web: debug
