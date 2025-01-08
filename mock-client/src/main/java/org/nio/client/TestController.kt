@@ -76,6 +76,7 @@ class TestController @Autowired constructor(
 
     @PostMapping("/bulk-transfers", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun bulkTransfers(
+        @RequestParam parallel: Int,
         @RequestParam userCount: Long,
         @RequestParam transactionPerUser: Int,
         @RequestPart("file")
@@ -91,7 +92,7 @@ class TestController @Autowired constructor(
         var i = 0
         accountIds.toFlux()
             .skip(userCount)
-            .parallel(10)
+            .parallel(parallel)
             .runOn(Schedulers.fromExecutor(VirtualThreadTaskExecutor("bulk-transfer")))
             .flatMap { accountId ->
                 i++

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public void main(String[] args) throws IOException {
         String apiKey = "";
         String model = "gpt-4o-mini";
         List<CompletionBuilder.Message> messages = new ArrayList<>();

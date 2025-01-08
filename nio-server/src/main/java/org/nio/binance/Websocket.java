@@ -10,10 +10,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class Websocket {
-    public static void main(String[] args) throws InterruptedException {
-        test();
-    }
-
     public static void test() throws InterruptedException {
         SignatureGenerator signatureGenerator = new MyRsaSig("id_rsa");
         WebSocketApiClient wsApiClient = new WebSocketApiClientImpl("ljWwvXmOoE4RmkmEbCNHJn6cnO67fRaVidugZT1cephKYaJzE5YWyTTDW7tCglHX", signatureGenerator);
