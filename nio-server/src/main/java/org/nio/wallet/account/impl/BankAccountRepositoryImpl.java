@@ -1,11 +1,11 @@
-package org.tik.bank.impl;
+package org.nio.wallet.account.impl;
 
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import lombok.RequiredArgsConstructor;
+import org.nio.wallet.account.BankAccount;
+import org.nio.wallet.account.BankAccountRepositoryCustom;
 import org.springframework.data.cassandra.core.ReactiveCassandraTemplate;
 import org.springframework.stereotype.Repository;
-import org.tik.bank.BankAccount;
-import org.tik.bank.BankAccountRepositoryCustom;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;

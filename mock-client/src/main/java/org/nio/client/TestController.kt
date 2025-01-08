@@ -1,7 +1,7 @@
 package org.nio.client
 
 import com.google.protobuf.Empty
-import com.tik.grpc.bank.service.ReactorBankAccountServiceGrpc.ReactorBankAccountServiceStub
+import com.nio.wallet.grpc.ReactorWalletServiceGrpc.ReactorWalletServiceStub
 import net.devh.boot.grpc.client.inject.GrpcClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PostMapping
@@ -13,7 +13,7 @@ import reactor.core.publisher.Flux
 @RequestMapping("/api/v1/test")
 class TestController @Autowired constructor(
     @GrpcClient("bank-account-service")
-    val stub: ReactorBankAccountServiceStub
+    val stub: ReactorWalletServiceStub
 ) {
     @PostMapping
     fun test(): String {

@@ -1,3 +1,3 @@
-package org.tik.bank
+package org.nio.wallet.account
 
 class InvalidAmountException(message: String) : RuntimeException(message)

@@ -1,4 +1,4 @@
-package org.tik.endpoint
+package org.nio.wallet.endpoint
 
 import io.grpc.Status
 import io.grpc.StatusException

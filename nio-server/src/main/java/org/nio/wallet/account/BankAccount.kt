@@ -1,4 +1,4 @@
-package org.tik.bank
+package org.nio.wallet.account
 
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType.PARTITIONED
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn

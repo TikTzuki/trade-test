@@ -1,22 +1,22 @@
 syntax = "proto3";
 
-package com.tik.grpc.bank.service;
+package com.nio.wallet.grpc;
 
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
-service BankAccountService {
+service WalletService {
   rpc ping (stream google.protobuf.Empty) returns (stream google.protobuf.StringValue);
-  rpc createBankAccount (CreateBankAccountRequest) returns (CreateBankAccountResponse);
-  rpc getBankAccountById (GetBankAccountByIdRequest) returns (GetBankAccountByIdResponse);
+  rpc createAccount (CreateAccountRequest) returns (CreateAccountResponse);
+  rpc getAccountById (GetAccountByIdRequest) returns (GetAccountByIdResponse);
   rpc depositBalance (DepositBalanceRequest) returns (DepositBalanceResponse);
   rpc withdrawBalance (WithdrawBalanceRequest) returns (WithdrawBalanceResponse);
   rpc getAllByBalance (GetAllByBalanceRequest) returns (stream GetAllByBalanceResponse);
   rpc getAllByBalanceWithPagination(GetAllByBalanceWithPaginationRequest) returns (GetAllByBalanceWithPaginationResponse);
 }
 
-message BankAccountData {
+message AccountData {
   string id = 1;
   string firstName = 2;
   string lastName = 3;
@@ -29,7 +29,7 @@ message BankAccountData {
   string updatedAt = 10;
 }
 
-message CreateBankAccountRequest {
+message CreateAccountRequest {
   string email = 1;
   string firstName = 2;
   string lastName = 3;
@@ -39,16 +39,16 @@ message CreateBankAccountRequest {
   double balance = 7;
 }
 
-message CreateBankAccountResponse {
-  string bankAccount = 1;
+message CreateAccountResponse {
+  string accountId = 1;
 }
 
-message GetBankAccountByIdRequest {
+message GetAccountByIdRequest {
   string id = 1;
 }
 
-message GetBankAccountByIdResponse {
-  BankAccountData bankAccount = 1;
+message GetAccountByIdResponse {
+  AccountData account = 1;
 }
 
 message DepositBalanceRequest {
@@ -57,7 +57,7 @@ message DepositBalanceRequest {
 }
 
 message DepositBalanceResponse {
-  BankAccountData bankAccount = 1;
+  AccountData account = 1;
 }
 
 message WithdrawBalanceRequest {
@@ -66,7 +66,7 @@ message WithdrawBalanceRequest {
 }
 
 message WithdrawBalanceResponse {
-  BankAccountData bankAccount = 1;
+  AccountData account = 1;
 }
 
 message GetAllByBalanceRequest {
@@ -77,7 +77,7 @@ message GetAllByBalanceRequest {
 }
 
 message GetAllByBalanceResponse {
-  BankAccountData bankAccount = 1;
+  AccountData account = 1;
 }
 
 message GetAllByBalanceWithPaginationRequest {
@@ -88,7 +88,7 @@ message GetAllByBalanceWithPaginationRequest {
 }
 
 message GetAllByBalanceWithPaginationResponse {
-  repeated BankAccountData bankAccount = 1;
+  repeated AccountData account = 1;
   int32 page = 2;
   int32 size = 3;
   int32 totalElements = 4;

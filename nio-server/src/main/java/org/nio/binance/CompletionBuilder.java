@@ -1,4 +1,4 @@
-package org.tik.binance;
+package org.nio.binance;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

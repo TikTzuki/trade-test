@@ -1,12 +1,12 @@
-package org.tik.bank.impl;
+package org.nio.wallet.account.impl;
 
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.nio.wallet.account.BankAccount;
+import org.nio.wallet.account.BankAccountRepository;
+import org.nio.wallet.account.BankAccountService;
 import org.springframework.stereotype.Service;
-import org.tik.bank.BankAccount;
-import org.tik.bank.BankAccountRepository;
-import org.tik.bank.BankAccountService;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;

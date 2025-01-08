@@ -1,16 +1,16 @@
-package org.tik.endpoint;
+package org.nio.wallet.endpoint;
 
 import com.google.protobuf.Empty;
 import com.google.protobuf.StringValue;
-import com.tik.grpc.bank.service.Bank.CreateBankAccountRequest;
-import com.tik.grpc.bank.service.Bank.CreateBankAccountResponse;
-import com.tik.grpc.bank.service.Bank.GetBankAccountByIdRequest;
-import com.tik.grpc.bank.service.Bank.GetBankAccountByIdResponse;
-import com.tik.grpc.bank.service.ReactorBankAccountServiceGrpc;
+import com.nio.wallet.grpc.ReactorWalletServiceGrpc;
+import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountRequest;
+import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountResponse;
+import com.nio.wallet.grpc.WalletServiceOuterClass.GetAccountByIdRequest;
+import com.nio.wallet.grpc.WalletServiceOuterClass.GetAccountByIdResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.tik.bank.BankAccountService;
+import org.nio.wallet.account.BankAccountService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -19,7 +19,7 @@ import java.time.Duration;
 @Slf4j
 @GrpcService
 @RequiredArgsConstructor
-public class BackAccountGrpcService extends ReactorBankAccountServiceGrpc.BankAccountServiceImplBase {
+public class BackAccountGrpcService extends ReactorWalletServiceGrpc.WalletServiceImplBase {
     private static final Long TIMEOUT_MILLIS = 5000L;
     private final BankAccountService bankAccountService;
 
@@ -32,22 +32,22 @@ public class BackAccountGrpcService extends ReactorBankAccountServiceGrpc.BankAc
     }
 
     @Override
-    public Mono<CreateBankAccountResponse> createBankAccount(Mono<CreateBankAccountRequest> request) {
+    public Mono<CreateAccountResponse> createAccount(Mono<CreateAccountRequest> request) {
         return request.flatMap(req -> bankAccountService.createBankAccount(MapperKt.of(req))
                         .doOnNext(v -> log.debug("span req {}", req)))
-                .map(bankAccount -> CreateBankAccountResponse.newBuilder()
-                        .setBankAccount(bankAccount.toString())
+                .map(bankAccount -> CreateAccountResponse.newBuilder()
+                        .setAccountId(bankAccount.toString())
                         .build())
                 .timeout(Duration.ofMillis(TIMEOUT_MILLIS))
                 .doOnError(ex -> {
                     log.error(ex.getMessage(), ex);
                 })
-                .doOnSuccess(result -> log.info("created account: {}", result.getBankAccount()));
+                .doOnSuccess(result -> log.info("created account: {}", result.getAccountId()));
     }
 
     @Override
-    public Mono<GetBankAccountByIdResponse> getBankAccountById(Mono<GetBankAccountByIdRequest> request) {
-        return Mono.just(GetBankAccountByIdResponse.newBuilder()
+    public Mono<GetAccountByIdResponse> getAccountById(Mono<GetAccountByIdRequest> request) {
+        return Mono.just(GetAccountByIdResponse.newBuilder()
                 .build());
     }
     //    private <T> T validate(T data) {

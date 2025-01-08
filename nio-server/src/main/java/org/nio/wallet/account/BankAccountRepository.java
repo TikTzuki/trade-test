@@ -1,4 +1,4 @@
-package org.tik.bank;
+package org.nio.wallet.account;
 
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;
 

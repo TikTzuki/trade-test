@@ -1,4 +1,4 @@
-package org.tik.binance;
+package org.nio.binance;
 
 import com.binance.connector.client.utils.ParameterChecker;
 import com.binance.connector.client.utils.signaturegenerator.SignatureGenerator;
