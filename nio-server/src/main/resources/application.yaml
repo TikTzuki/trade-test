@@ -13,7 +13,7 @@ spring:
     #    password: Nt72v7ioLWEfo7fPbiWfjO1YZ2NWoxxAjLuQaqNdNA8wSbFKicPirjA
     #    contact-points: 10.8.0.7
     schema-action: create_if_not_exists
-    config: keyspaces-application.conf
+    config: cassandra-application.conf
   threads:
     virtual:
       enabled: true
