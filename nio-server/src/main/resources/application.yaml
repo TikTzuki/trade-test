@@ -4,7 +4,7 @@ grpc:
     reflection-service-enabled: true
 spring:
   main:
-    web-application-type: none
+    web-application-type: reactive
   cassandra:
     #    local-datacenter: dc1
     #    port: 31646
@@ -13,12 +13,21 @@ spring:
     #    password: Nt72v7ioLWEfo7fPbiWfjO1YZ2NWoxxAjLuQaqNdNA8wSbFKicPirjA
     #    contact-points: 10.8.0.7
     schema-action: create_if_not_exists
-    config: cassandra-application.conf
+    config: classpath:cassandra-application.conf
   threads:
     virtual:
       enabled: true
 logging:
   level:
-    web: warn
+    org.nio: error
+    web: error
     org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: error
-    root: warn
+    io.grpc: error
+    root: info
+management:
+  endpoints:
+    web:
+      exposure:
+        include: [ "*" ]
+server:
+  port: 8081

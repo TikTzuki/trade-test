@@ -2,7 +2,8 @@ package org.nio.client
 
 import com.google.protobuf.Empty
 import com.nio.wallet.grpc.ReactorWalletServiceGrpc.ReactorWalletServiceStub
-import com.nio.wallet.grpc.WalletServiceOuterClass.*
+import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountRequest
+import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountResponse
 import net.devh.boot.grpc.client.inject.GrpcClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.buffer.DataBuffer
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
-import reactor.kotlin.core.publisher.toFlux
 
 val TRANSFER_RANGE = listOf("1", "5", "10")
 
@@ -25,7 +25,8 @@ val TRANSFER_RANGE = listOf("1", "5", "10")
 @RequestMapping("/api/v1/wallet")
 class TestController @Autowired constructor(
     @GrpcClient("bank-account-service")
-    val stub: ReactorWalletServiceStub
+    val stub: ReactorWalletServiceStub,
+    val workerService: WorkerService
 ) {
     @PostMapping("/ping")
     fun test(): String {
@@ -45,7 +46,7 @@ class TestController @Autowired constructor(
 
     @PostMapping("/bulk-insert-accounts")
     fun bulkInsertAccounts(@RequestParam number: Int): ResponseEntity<Flux<DataBuffer>> {
-        val reqFlux: Flux<CreateAccountResponse> = Flux.generate({ 0 }, { state, sink ->
+        val reqFlux = Flux.generate({ 0 }, { state, sink ->
             if (state < number) {
                 sink.next(
                     CreateAccountRequest.newBuilder()
@@ -57,11 +58,15 @@ class TestController @Autowired constructor(
                 sink.complete()
                 state
             }
-        }).flatMap {
-            val resp: Mono<CreateAccountResponse> = stub.createAccount(Mono.just(it))
-            return@flatMap resp
-        }
-        // Create csv file
+        })
+            .parallel(3)
+            .runOn(Schedulers.fromExecutor(VirtualThreadTaskExecutor()))
+            .flatMap {
+                val resp: Mono<CreateAccountResponse> = stub.createAccount(Mono.just(it))
+                return@flatMap resp
+            }
+            .sequential()
+
         val bufferFlux: Flux<DataBuffer> = reqFlux.map {
             val bytes = (it.accountId + "\n").toByteArray(Charsets.UTF_8)
             return@map DefaultDataBufferFactory.sharedInstance.wrap(bytes)
@@ -89,25 +94,32 @@ class TestController @Autowired constructor(
                         reader.readLines()
                     }
             }.block()!!
-        var i = 0
-        accountIds.toFlux()
-            .skip(userCount)
-            .parallel(parallel)
-            .runOn(Schedulers.fromExecutor(VirtualThreadTaskExecutor("bulk-transfer")))
-            .flatMap { accountId ->
-                i++
-                if (i % 50_000 == 0)
-                    println(i)
-                return@flatMap stub.transfer(
-                    Mono.just(
-                        TransferRequest.newBuilder()
-                            .setUserId(accountId)
-                            .setAmount(TRANSFER_RANGE.random())
-                            .build()
-                    )
-                )
-            }.subscribe { }
+//        var i = 0
+//        accountIds.toFlux()
+//            .skip(accountIds.size - userCount)
+//            .parallel(parallel)
+//            .runOn(Schedulers.fromExecutor(VirtualThreadTaskExecutor("bulk-transfer")))
+//            .flatMap { accountId ->
+//                i++
+//                if (i % 50_000 == 0)
+//                    println(i)
+//                return@flatMap stub.transfer(
+//                    Mono.just(
+//                        TransferRequest.newBuilder()
+//                            .setUserId(accountId)
+//                            .setAmount(TRANSFER_RANGE.random())
+//                            .build()
+//                    )
+//                )
+//            }.subscribe { }
+        workerService.startRun(accountIds, userCount, transactionPerUser)
         return "Hello, World!"
+    }
+
+    @GetMapping("/stop-transfers")
+    fun stopTransfers(): String {
+        workerService.stopRun()
+        return "Stopped"
     }
 
     companion object

@@ -14,6 +14,8 @@ ext {
             implementation "io.netty:netty-all:4.1.82.Final"
             implementation "org.springframework.boot:spring-boot-starter-webflux"
             implementation "org.springframework.boot:spring-boot-starter-data-cassandra-reactive"
+            implementation "io.micrometer:micrometer-registry-prometheus"
+            implementation "org.springframework.boot:spring-boot-starter-actuator"
             implementation "software.aws.mcs:aws-sigv4-auth-cassandra-java-driver-plugin:4.0.6"
 
             compileOnly "org.projectlombok:lombok:1.18.36"

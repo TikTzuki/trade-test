@@ -56,7 +56,8 @@ public class WalletGrpcService extends ReactorWalletServiceGrpc.WalletServiceImp
 
     @Override
     public Mono<TransferResponse> transfer(Mono<TransferRequest> request) {
-        return request.flatMap(transactionService::transfer)
+        return request
+                .flatMap(transactionService::transfer)
                 .map(newTran -> TransferResponse.newBuilder()
                         .build())
                 .timeout(Duration.ofMillis(TIMEOUT_MILLIS))
