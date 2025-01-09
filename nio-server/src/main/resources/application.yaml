@@ -19,10 +19,11 @@ spring:
       enabled: true
 logging:
   level:
-    org.nio: error
+    org.nio: warn
     web: error
     org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: error
     io.grpc: error
+    reactor.netty: warn
     root: info
 management:
   endpoints:

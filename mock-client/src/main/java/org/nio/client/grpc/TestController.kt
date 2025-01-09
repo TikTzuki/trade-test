@@ -1,4 +1,4 @@
-package org.nio.client
+package org.nio.client.grpc
 
 import com.google.protobuf.Empty
 import com.nio.wallet.grpc.ReactorWalletServiceGrpc.ReactorWalletServiceStub
@@ -26,7 +26,7 @@ val TRANSFER_RANGE = listOf("1", "5", "10")
 class TestController @Autowired constructor(
     @GrpcClient("bank-account-service")
     val stub: ReactorWalletServiceStub,
-    val workerService: WorkerService
+    val workerService: GrpcWorkerService
 ) {
     @PostMapping("/ping")
     fun test(): String {
@@ -59,13 +59,13 @@ class TestController @Autowired constructor(
                 state
             }
         })
-            .parallel(3)
-            .runOn(Schedulers.fromExecutor(VirtualThreadTaskExecutor()))
+//            .parallel(3)
+//            .runOn(Schedulers.fromExecutor(VirtualThreadTaskExecutor()))
             .flatMap {
                 val resp: Mono<CreateAccountResponse> = stub.createAccount(Mono.just(it))
                 return@flatMap resp
             }
-            .sequential()
+//            .sequential()
 
         val bufferFlux: Flux<DataBuffer> = reqFlux.map {
             val bytes = (it.accountId + "\n").toByteArray(Charsets.UTF_8)
@@ -117,7 +117,7 @@ class TestController @Autowired constructor(
     }
 
     @GetMapping("/stop-transfers")
-    fun stopTransfers(): String {
+    fun stopScheduler(): String {
         workerService.stopRun()
         return "Stopped"
     }

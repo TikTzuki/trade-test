@@ -20,4 +20,4 @@ logging:
   level:
     web: info
     io.grpc: info
-    org.nio: debug
+    org.nio: info

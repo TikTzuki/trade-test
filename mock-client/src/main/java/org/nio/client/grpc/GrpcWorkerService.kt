@@ -1,4 +1,4 @@
-package org.nio.client
+package org.nio.client.grpc
 
 import com.nio.wallet.grpc.ReactorWalletServiceGrpc.ReactorWalletServiceStub
 import com.nio.wallet.grpc.WalletServiceOuterClass.TransferRequest
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 
 
 @Service
-class WorkerService @Autowired constructor(
+class GrpcWorkerService @Autowired constructor(
     @GrpcClient("bank-account-service")
     val stub: ReactorWalletServiceStub
 ) {
