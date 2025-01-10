@@ -1,4 +1,4 @@
-package org.nio.wallet.endpoint;
+package org.nio.endpoint;
 
 import com.google.protobuf.Empty;
 import com.google.protobuf.StringValue;
@@ -27,7 +27,7 @@ import static com.nio.wallet.grpc.WalletServiceOuterClass.TransferResponse;
 @Slf4j
 @GrpcService
 @RequiredArgsConstructor
-public class WalletGrpcService extends ReactorWalletServiceGrpc.WalletServiceImplBase {
+public class WalletGrpcEndpoint extends ReactorWalletServiceGrpc.WalletServiceImplBase {
     private static final Long TIMEOUT_MILLIS = 5_000L;
     final AccountService bankAccountService;
     final TransactionService transactionService;
@@ -57,7 +57,7 @@ public class WalletGrpcService extends ReactorWalletServiceGrpc.WalletServiceImp
     @Override
     public Mono<TransferResponse> transfer(Mono<TransferRequest> request) {
         return request
-                .flatMap(transactionService::transfer)
+//                .flatMap(transactionService::transfer)
                 .map(newTran -> TransferResponse.newBuilder()
                         .build())
                 .timeout(Duration.ofMillis(TIMEOUT_MILLIS))

@@ -20,4 +20,6 @@ logging:
   level:
     web: info
     io.grpc: info
-    org.nio: info
+    org.nio: debug
+    org.nio.client.transaction: debug # log transaction
+    reactor.netty: debug

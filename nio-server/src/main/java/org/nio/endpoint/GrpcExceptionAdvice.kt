@@ -1,4 +1,4 @@
-package org.nio.wallet.endpoint
+package org.nio.endpoint
 
 import io.grpc.Status
 import io.grpc.StatusException

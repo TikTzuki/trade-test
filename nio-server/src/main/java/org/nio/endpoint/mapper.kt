@@ -1,4 +1,4 @@
-package org.nio.wallet.endpoint
+package org.nio.endpoint
 
 import com.nio.wallet.grpc.WalletServiceOuterClass.AccountData
 import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountRequest

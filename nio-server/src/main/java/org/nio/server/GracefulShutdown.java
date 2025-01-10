@@ -1,23 +1,26 @@
 package org.nio.server;
-import java.time.Duration;
-import java.util.function.Supplier;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.web.server.GracefulShutdownCallback;
 import org.springframework.boot.web.server.GracefulShutdownResult;
 import reactor.netty.DisposableServer;
-final class GracefulShutdown {
+
+import java.time.Duration;
+import java.util.function.Supplier;
+
+public class GracefulShutdown {
     private static final Log logger = LogFactory.getLog(GracefulShutdown.class);
     private final Supplier<DisposableServer> disposableServer;
     private volatile Thread shutdownThread;
     private volatile boolean shuttingDown;
 
-    GracefulShutdown(Supplier<DisposableServer> disposableServer) {
+    public GracefulShutdown(Supplier<DisposableServer> disposableServer) {
         this.disposableServer = disposableServer;
     }
 
-    void shutDownGracefully(GracefulShutdownCallback callback) {
-        DisposableServer server = (DisposableServer)this.disposableServer.get();
+    public void shutDownGracefully(GracefulShutdownCallback callback) {
+        DisposableServer server = this.disposableServer.get();
         if (server != null) {
             logger.info("Commencing graceful shutdown. Waiting for active requests to complete");
             this.shutdownThread = new Thread(() -> this.doShutdown(callback, server), "netty-shutdown");

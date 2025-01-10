@@ -1,5 +1,9 @@
 Cassandra CQL
 
+```bash
+k -n database exec -ti cluster1-dc1-default-sts-1 -c cassandra -- sh -c "cqlsh -u 'cluster1-superuser' -p 't72v7ioLWEfo7fPbiWfjO1YZ2NWoxxAjLuQaqNdNA8wSbFKicPirjA'"
+```
+
 ```dockerfile
 docker run -d --name=prometheus -p 9090:9090 -v .\prometheus\prometheus.yaml:/etc/prometheus/prometheus.yml prom/prometheus
 
