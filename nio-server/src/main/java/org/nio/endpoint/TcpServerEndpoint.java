@@ -53,18 +53,21 @@ public class TcpServerEndpoint {
 
     public BiFunction<? super NettyInbound, ? super NettyOutbound, ? extends Publisher<Void>> onMessage() {
         return (inbound, outbound) -> {
-            return inbound.receive()
-                    .flatMap(byteBuf -> {
-                        List<TransferRequest> requests = IOUtils.parseByteArray(byteBuf, (inputStream) -> {
-                            try {
-                                return TransferRequest.parseDelimitedFrom(inputStream);
-                            } catch (IOException e) {
-                                log.error(e.getMessage(), e);
-                                return null;
-                            }
-                        });
-                        return Flux.fromIterable(requests);
-                    })
+            return IOUtils.deserializeMessages(inbound.receive(), TransferRequest.newBuilder())
+//            ;
+//            return inbound.receive()
+//                    .flatMap(byteBuf -> {
+//                        IOUtils.deserializeMessages(byteBuf, TransferRequest.newBuilder());
+//                        List<TransferRequest> requests = IOUtils.parseByteArray(byteBuf, (inputStream) -> {
+//                            try {
+//                                return TransferRequest.parseDelimitedFrom(inputStream);
+//                            } catch (IOException e) {
+//                                log.error(e.getMessage(), e);
+//                                return null;
+//                            }
+//                        });
+//                        return Flux.fromIterable(requests);
+//                    })
                     .flatMap(data -> {
                         log.info("Received data: {}", data.toString());
                         // handle main logic
@@ -73,7 +76,6 @@ public class TcpServerEndpoint {
                         try {
                             return outbound.sendByteArray(Mono.just(IOUtils.serializeMessages(
                                     TransferResponse.newBuilder()
-                                            .setReferenceId(data.getReferenceId())
                                             .setTransactionId(transactionId)
                                             .build())
                             )).then();
