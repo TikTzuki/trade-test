@@ -18,8 +18,12 @@ public class AccountCustomRepositoryImpl implements AccountCustomRepository<Acco
     @Override
     public Mono<String> insertLite(Account i) {
         return template.execute(SimpleStatement.newInstance("INSERT INTO " + ACCOUNT_TABLE + "(id, balance) VALUES (?, ?)", i.getId(), i.getBalance()))
-                .map(r -> {
-                    return i.getId();
-                });
+                .map(r -> i.getId());
     }
+
+//    @Override
+//    public Mono<Void> updateBalance(String id, BigDecimal balance, Long version) {
+//        template.execute(SimpleStatement.newInstance("UPDATE " + ACCOUNT_TABLE + " SET balance = ? WHERE id = ? IF VERSION = ?", balance, id, version));
+//        return null;
+//    }
 }

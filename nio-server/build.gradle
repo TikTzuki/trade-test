@@ -7,8 +7,8 @@ ext {
             implementation 'io.projectreactor.kotlin:reactor-kotlin-extensions'
             implementation 'org.jetbrains.kotlin:kotlin-reflect'
             implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
+            implementation "io.github.microutils:kotlin-logging-jvm:3.0.5"
 
-            implementation "io.github.binance:binance-connector-java:3.4.0"
             implementation "com.squareup.okhttp3:okhttp:4.12.0"
 
             implementation "io.netty:netty-all:4.1.82.Final"
@@ -24,13 +24,13 @@ ext {
             // Grpc
             implementation "com.google.protobuf:protoc:3.24.0"
             implementation 'net.devh:grpc-server-spring-boot-starter:3.1.0.RELEASE'
-
             implementation "com.salesforce.servicelibs:reactor-grpc-stub:1.2.4"
-//            implementation 'org.springframework.grpc:spring-grpc-core'
+            implementation 'org.springframework.grpc:spring-grpc-core'
 
             // Test
             testImplementation "org.junit.jupiter:junit-jupiter"
             testImplementation "org.testng:testng:7.10.2"
+            testImplementation 'org.assertj:assertj-core'
         }
         dependencyManagement {
             imports {

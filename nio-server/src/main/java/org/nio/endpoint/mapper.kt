@@ -1,4 +1,4 @@
-package org.nio.wallet.endpoint
+package org.nio.endpoint
 
 import com.nio.wallet.grpc.WalletServiceOuterClass.AccountData
 import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountRequest
@@ -15,6 +15,7 @@ fun Account.toGrpc(): AccountData {
 fun CreateAccountRequest.of(): Account {
     return Account(
         id = randomUUID().toString(),
-        balance = BigDecimal.ZERO
+        balance = BigDecimal.ZERO,
+        version = 1
     )
 }

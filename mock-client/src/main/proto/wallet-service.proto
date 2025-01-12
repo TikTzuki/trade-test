@@ -14,6 +14,7 @@ service WalletService {
   rpc withdraw (WithdrawRequest) returns (WithdrawResponse);
 
   rpc transfer (TransferRequest) returns (TransferResponse);
+  rpc transferStream (stream TransferRequest) returns (stream TransferResponse);
   rpc closeTicket (CloseTicketRequest) returns (CloseTicketResponse);
 
   //  rpc getAllByBalance (GetAllByBalanceRequest) returns (stream GetAllByBalanceResponse);
@@ -32,6 +33,16 @@ message TransferRequest {
   string gameId = 6;
   string gameName = 7;
   string gameRoundId = 8;
+}
+
+message ErrorDetail {
+  ErrorCode code = 1;
+  string message = 2;
+}
+
+enum ErrorCode {
+  INSUFFICIENT_BALANCE = 0;
+  INSERT_TRANSACTION_FAILED = 1;
 }
 
 message TransferResponse {

@@ -1,4 +1,4 @@
-package org.nio.wallet.endpoint;
+package org.nio.endpoint;
 
 import com.google.protobuf.Empty;
 import com.google.protobuf.StringValue;
@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.UUID;
 
 import static com.nio.wallet.grpc.WalletServiceOuterClass.CloseTicketRequest;
 import static com.nio.wallet.grpc.WalletServiceOuterClass.CloseTicketResponse;
@@ -27,7 +28,7 @@ import static com.nio.wallet.grpc.WalletServiceOuterClass.TransferResponse;
 @Slf4j
 @GrpcService
 @RequiredArgsConstructor
-public class WalletGrpcService extends ReactorWalletServiceGrpc.WalletServiceImplBase {
+public class WalletGrpcEndpoint extends ReactorWalletServiceGrpc.WalletServiceImplBase {
     private static final Long TIMEOUT_MILLIS = 5_000L;
     final AccountService bankAccountService;
     final TransactionService transactionService;
@@ -55,16 +56,30 @@ public class WalletGrpcService extends ReactorWalletServiceGrpc.WalletServiceImp
     }
 
     @Override
-    public Mono<TransferResponse> transfer(Mono<TransferRequest> request) {
+    public Flux<TransferResponse> transferStream(Flux<TransferRequest> request) {
         return request
                 .flatMap(transactionService::transfer)
                 .map(newTran -> TransferResponse.newBuilder()
+                        .setTransactionId(newTran.getId())
+                        .setReferenceId(newTran.getRefId())
+                        .build())
+                .doOnNext(result -> log.debug("Write success tran: {}", result))
+                .timeout(Duration.ofMillis(TIMEOUT_MILLIS));
+    }
+
+    @Override
+    public Mono<TransferResponse> transfer(Mono<TransferRequest> request) {
+        return request
+//                .flatMap(transactionService::transfer)
+                .map(newTran -> TransferResponse.newBuilder()
+                        .setTransactionId(UUID.randomUUID().toString())
+                        .setReferenceId(newTran.getReferenceId())
                         .build())
                 .timeout(Duration.ofMillis(TIMEOUT_MILLIS))
                 .doOnError(ex -> {
                     log.error(ex.getMessage(), ex);
                 })
-                .doOnSuccess(result -> log.debug("transfer: {}", result));
+                .doOnSuccess(result -> log.debug("Write success tran: {}", result));
     }
 
     @Override

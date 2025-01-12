@@ -14,6 +14,11 @@ enum class TransactionType {
     WITHDRAW
 }
 
+enum class TransactionAction {
+    BET,
+    WIN,
+}
+
 @Table("transaction")
 data class Transaction(
     @PrimaryKeyColumn(type = PARTITIONED)
@@ -22,23 +27,22 @@ data class Transaction(
     @PrimaryKeyColumn(type = PARTITIONED)
     val accountId: String,
 
-    @PrimaryKeyColumn(type = PARTITIONED)
-    val ticketId: String,
-
-    @PrimaryKeyColumn(type = PARTITIONED)
-    val shard: Int,
-
     @PrimaryKeyColumn(type = CLUSTERED, ordering = DESCENDING)
     val timeStamp: Instant,
 
+    val ticketId: String,
+
     val type: TransactionType,
+
+    val action: TransactionAction,
 
     val refId: String,
 
     val amount: BigDecimal,
 
-    val balanceAfterWrite: BigDecimal
+    val balanceAfterWrite: BigDecimal,
 
+    var version: Long
 ) {
     companion object {
         fun generateShard(id: String, accountId: String, ticketId: String): Int {
@@ -46,4 +50,5 @@ data class Transaction(
             return (hash % 9) + 1
         }
     }
+
 }

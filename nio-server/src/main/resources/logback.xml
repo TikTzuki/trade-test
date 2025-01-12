@@ -19,15 +19,41 @@
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
     </appender>
+    <appender name="TransactionRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="org.nio.transaction.TranLogger"/>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%m%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/receive-transaction-%d{yyyy-MM-dd-HH}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFileNamingAndTriggeringPolicy">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+    <appender name="DeadLetterLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="org.nio.transaction.TranLogger"/>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d [%t] %p %C{}: %m%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/dead-letter-%d{yyyy-MM-dd-HH}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFileNamingAndTriggeringPolicy">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
     <springProfile name="dev | default">
         <root level="info">
             <appender-ref ref="Console"/>
+            <appender-ref ref="DeadLetterLog"/>
         </root>
     </springProfile>
     <springProfile name="prod | production">
         <root level="info">
             <appender-ref ref="Console"/>
             <appender-ref ref="RollingFile"/>
+            <appender-ref ref="DeadLetterLog"/>
         </root>
     </springProfile>
 </configuration>
