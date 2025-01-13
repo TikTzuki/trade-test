@@ -19,17 +19,15 @@ spring:
       enabled: true
 logging:
   level:
-    org.nio: debug
-    org.nio.transaction.TranLogger: debug
-    web: info
-    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: debug
-    io.grpc: info
-    reactor.netty: info
-    root: info
-    com.amazon: info
-    com.amazonaws: debug
-    javax.jms: debug
+    org.nio: off
+    org.nio.transaction.TranLogger: error
+    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: off
+    io.grpc: off
+    reactor.netty: off
+    com.amazon: off
     com.datastax: off
+    web: info
+    root: info
 management:
   endpoints:
     web:

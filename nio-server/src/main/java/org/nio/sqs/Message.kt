@@ -1,30 +1,32 @@
 package org.nio.sqs
 
-import com.google.protobuf.GeneratedMessageV3
+import com.nio.wallet.grpc.WalletServiceOuterClass.TransferRequest
 import mu.KotlinLogging
 import org.nio.config.QueueConfig
 import software.amazon.awssdk.core.SdkBytes
 import software.amazon.awssdk.services.sqs.SqsClient
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue
-import software.amazon.awssdk.services.sqs.model.SendMessageRequest
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry
 
 val logger = KotlinLogging.logger {}
 
-fun SqsClient.publish(msg: GeneratedMessageV3) {
-
-    try {
+fun SqsClient.publish(msgs: List<TransferRequest>) {
+    val entries = msgs.map {
         val metadata = MessageAttributeValue.builder()
-            .binaryValue(SdkBytes.fromByteArray(msg.toByteArray()))
+            .binaryValue(SdkBytes.fromByteArray(it.toByteArray()))
             .dataType("Binary")
             .build()
-        val sendMsgRequest = SendMessageRequest.builder()
-            .queueUrl(QueueConfig.QUEUE_URL)
+        return@map SendMessageBatchRequestEntry.builder()
             .messageAttributes(mapOf("grpc" to metadata))
-            .messageBody(msg.javaClass.name)
+            .id(it.referenceId)
+            .messageBody(it.javaClass.name)
             .build()
-
-        this.sendMessage(sendMsgRequest)
-    } catch (e: Exception) {
-        logger.error { e }
     }
+    this.sendMessageBatch(
+        SendMessageBatchRequest.builder()
+            .queueUrl(QueueConfig.QUEUE_URL)
+            .entries(entries)
+            .build()
+    )
 }

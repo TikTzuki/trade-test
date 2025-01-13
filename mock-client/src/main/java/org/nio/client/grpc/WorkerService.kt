@@ -80,10 +80,12 @@ class GrpcWorkerService @Autowired constructor(
                         TransferRequest.newBuilder()
                             .setUserId(accountId)
                             .setAmount("1")
-                            .setReferenceId(genReferenceId(accountId))
-                            .build()
                     )
                         .repeat(transPerUser.toLong())
+                        .map {
+                            it.setReferenceId(genReferenceId(accountId))
+                            return@map it.build()
+                        }
                 })
             .onErrorComplete { err ->
                 if (err is StatusRuntimeException) {

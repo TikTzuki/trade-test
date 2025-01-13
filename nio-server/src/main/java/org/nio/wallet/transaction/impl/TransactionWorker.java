@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -73,11 +73,12 @@ public class TransactionWorker {
                     })
                     .bufferTimeout(10, Duration.ofSeconds(50))
                     .doOnNext(batch -> {
-                        var entries = batch.stream().map(message -> DeleteMessageBatchRequestEntry.builder()
-                                .id(message.messageId())
-                                .receiptHandle(message.receiptHandle())
-                                .build()).toList();
-                        log.debug("Delete {} messages", entries);
+                        var entries = batch.stream()
+                                .peek(message -> log.debug("Delete message: {}", message.messageId()))
+                                .map(message -> DeleteMessageBatchRequestEntry.builder()
+                                        .id(message.messageId())
+                                        .receiptHandle(message.receiptHandle())
+                                        .build()).toList();
                         sqsClient.deleteMessageBatch(DeleteMessageBatchRequest.builder()
                                 .queueUrl(QueueConfig.QUEUE_URL)
                                 .entries(entries)
@@ -91,7 +92,7 @@ public class TransactionWorker {
     @PreDestroy
     public void destroy() throws InterruptedException {
         executorService.shutdown();
-        executorService.awaitTermination(1, MINUTES);
+        executorService.awaitTermination(20, SECONDS);
     }
 
 }

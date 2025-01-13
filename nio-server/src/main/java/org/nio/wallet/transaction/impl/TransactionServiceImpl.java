@@ -15,10 +15,12 @@ import org.nio.wallet.transaction.TransactionAction;
 import org.nio.wallet.transaction.TransactionRepository;
 import org.nio.wallet.transaction.TransactionType;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -30,18 +32,19 @@ public class TransactionServiceImpl {
     final AccountRepository accountRepository;
     final SqsClient sqsClient;
 
-    public Mono<Void> transfer(TransferRequest request) {
-        var id = UUID.randomUUID().toString();
-        var accountId = request.getUserId();
-        var ticketId = request.getTicketId();
-        var amount = new BigDecimal(request.getAmount());
-
-        try {
-            MessageKt.publish(sqsClient, request);
-        } catch (Exception e) {
-            return Mono.error(new InsertTransactionFail(request.getReferenceId()));
-        }
-        return Mono.empty();
+    public Flux<Void> prepareTransfer(Flux<TransferRequest> request) {
+        return request
+                .bufferTimeout(10, Duration.ofSeconds(1))
+                .flatMap(batch -> {
+                    try {
+                        MessageKt.publish(sqsClient, batch);
+                    } catch (Exception e) {
+                        log.info("Transfer fail {} {}", batch, e.getMessage());
+                        return Flux.concat(Flux.fromIterable(batch)
+                                .map(it -> Flux.error(new InsertTransactionFail(it.getReferenceId()))));
+                    }
+                    return Flux.empty();
+                });
     }
 
     public Mono<NewTransaction> persistTransaction(TransferRequest request) {

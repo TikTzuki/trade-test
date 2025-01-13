@@ -55,17 +55,16 @@ public class WalletGrpcEndpoint extends ReactorWalletServiceGrpc.WalletServiceIm
 
     @Override
     public Flux<TransferResponse> transferStream(Flux<TransferRequest> request) {
-        return request
-                .flatMap(transactionService::transfer)
+        return transactionService.prepareTransfer(request)
                 .map(_ -> TransferResponse.getDefaultInstance())
                 .timeout(Duration.ofMillis(TIMEOUT_MILLIS));
     }
 
     @Override
     public Mono<TransferResponse> transfer(Mono<TransferRequest> request) {
-        return request
-                .flatMap(transactionService::transfer)
-                .then(Mono.fromCallable(TransferResponse::getDefaultInstance))
+        return transactionService.prepareTransfer(request.flux())
+                .next()
+                .thenReturn(TransferResponse.getDefaultInstance())
                 .timeout(Duration.ofMillis(TIMEOUT_MILLIS))
                 .doOnError(ex -> {
                     log.error(ex.getMessage(), ex);
