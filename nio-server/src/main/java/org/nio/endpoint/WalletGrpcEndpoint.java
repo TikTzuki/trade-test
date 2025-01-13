@@ -12,8 +12,8 @@ import com.nio.wallet.grpc.WalletServiceOuterClass.WithdrawResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.nio.wallet.account.AccountService;
-import org.nio.wallet.transaction.impl.TransactionServiceImpl;
+import org.nio.account.AccountService;
+import org.nio.transaction.impl.TransactionServiceImpl;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

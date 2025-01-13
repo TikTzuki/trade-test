@@ -1,4 +1,4 @@
-package org.nio.wallet.transaction
+package org.nio.transaction
 
 import org.springframework.data.cassandra.core.cql.Ordering.DESCENDING
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType.CLUSTERED

@@ -1,4 +1,4 @@
-package org.nio.wallet.account;
+package org.nio.account;
 
 import reactor.core.publisher.Mono;
 

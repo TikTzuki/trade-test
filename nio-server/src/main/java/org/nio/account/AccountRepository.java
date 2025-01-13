@@ -1,4 +1,4 @@
-package org.nio.wallet.account;
+package org.nio.account;
 
 import com.datastax.oss.driver.api.core.DefaultConsistencyLevel;
 import org.springframework.data.cassandra.repository.Consistency;

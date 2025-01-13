@@ -1,4 +1,4 @@
-package org.nio.wallet.transaction;
+package org.nio.transaction;
 
 import org.springframework.data.cassandra.repository.Consistency;
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;

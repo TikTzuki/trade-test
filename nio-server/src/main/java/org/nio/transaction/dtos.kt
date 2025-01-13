@@ -1,4 +1,4 @@
-package org.nio.wallet.transaction
+package org.nio.transaction
 
 data class NewTransaction(
     val id: String,

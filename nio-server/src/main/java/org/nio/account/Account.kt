@@ -1,4 +1,4 @@
-package org.nio.wallet.account
+package org.nio.account
 
 import org.springframework.data.annotation.Version
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType.PARTITIONED

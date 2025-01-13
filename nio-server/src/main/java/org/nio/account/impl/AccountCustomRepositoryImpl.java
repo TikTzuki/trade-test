@@ -1,15 +1,15 @@
-package org.nio.wallet.account.impl;
+package org.nio.account.impl;
 
 import com.datastax.oss.driver.api.core.ConsistencyLevel;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import lombok.RequiredArgsConstructor;
-import org.nio.wallet.account.Account;
-import org.nio.wallet.account.AccountCustomRepository;
+import org.nio.account.Account;
+import org.nio.account.AccountCustomRepository;
 import org.springframework.data.cassandra.core.ReactiveCassandraTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import static org.nio.wallet.account.AccountKt.ACCOUNT_TABLE;
+import static org.nio.account.AccountKt.ACCOUNT_TABLE;
 
 @Component
 @RequiredArgsConstructor

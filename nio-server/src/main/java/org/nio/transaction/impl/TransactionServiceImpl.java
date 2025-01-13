@@ -1,19 +1,19 @@
-package org.nio.wallet.transaction.impl;
+package org.nio.transaction.impl;
 
 import com.nio.wallet.grpc.WalletServiceOuterClass.TransferRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.nio.account.AccountRepository;
 import org.nio.sqs.MessageKt;
 import org.nio.transaction.InsertTransactionFail;
 import org.nio.transaction.InsufficientBalance;
+import org.nio.transaction.NewTransaction;
 import org.nio.transaction.TranLogger;
+import org.nio.transaction.Transaction;
+import org.nio.transaction.TransactionAction;
+import org.nio.transaction.TransactionRepository;
+import org.nio.transaction.TransactionType;
 import org.nio.transaction.VersionConflict;
-import org.nio.wallet.account.AccountRepository;
-import org.nio.wallet.transaction.NewTransaction;
-import org.nio.wallet.transaction.Transaction;
-import org.nio.wallet.transaction.TransactionAction;
-import org.nio.wallet.transaction.TransactionRepository;
-import org.nio.wallet.transaction.TransactionType;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -33,18 +33,21 @@ public class TransactionServiceImpl {
     final SqsClient sqsClient;
 
     public Flux<Void> prepareTransfer(Flux<TransferRequest> request) {
+        long start = System.currentTimeMillis();
         return request
-                .bufferTimeout(10, Duration.ofSeconds(1))
+                .buffer(10)
                 .flatMap(batch -> {
                     try {
                         MessageKt.publish(sqsClient, batch);
                     } catch (Exception e) {
-                        log.info("Transfer fail {} {}", batch, e.getMessage());
+                        log.warn("Transfer fail {} {}", batch, e.getMessage());
                         return Flux.concat(Flux.fromIterable(batch)
                                 .map(it -> Flux.error(new InsertTransactionFail(it.getReferenceId()))));
                     }
                     return Flux.empty();
-                });
+                })
+                .doOnComplete(() -> log.info("Transfer complete: {}", System.currentTimeMillis() - start))
+                .thenMany(Flux.empty());
     }
 
     public Mono<NewTransaction> persistTransaction(TransferRequest request) {

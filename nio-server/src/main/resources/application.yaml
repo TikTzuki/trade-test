@@ -19,7 +19,7 @@ spring:
       enabled: true
 logging:
   level:
-    org.nio: off
+    org.nio: info
     org.nio.transaction.TranLogger: error
     org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: off
     io.grpc: off

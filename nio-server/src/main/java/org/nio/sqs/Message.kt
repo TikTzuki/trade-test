@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry
 val logger = KotlinLogging.logger {}
 
 fun SqsClient.publish(msgs: List<TransferRequest>) {
+    val startBatch = System.currentTimeMillis()
     val entries = msgs.map {
         val metadata = MessageAttributeValue.builder()
             .binaryValue(SdkBytes.fromByteArray(it.toByteArray()))
@@ -23,10 +24,20 @@ fun SqsClient.publish(msgs: List<TransferRequest>) {
             .messageBody(it.javaClass.name)
             .build()
     }
+    logger.debug(
+        "Prepare batch: {} - {}",
+        System.currentTimeMillis() - startBatch,
+        entries.size
+    )
     this.sendMessageBatch(
         SendMessageBatchRequest.builder()
             .queueUrl(QueueConfig.QUEUE_URL)
             .entries(entries)
             .build()
+    )
+    logger.debug(
+        "Transfer batch: {} - {}",
+        System.currentTimeMillis() - startBatch,
+        entries.size
     )
 }

@@ -1,4 +1,4 @@
-package org.nio.wallet.transaction;
+package org.nio.transaction;
 
 public interface TransactionCustomRepository {
 }

@@ -2,7 +2,7 @@ package org.nio.endpoint
 
 import com.nio.wallet.grpc.WalletServiceOuterClass.AccountData
 import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountRequest
-import org.nio.wallet.account.Account
+import org.nio.account.Account
 import java.math.BigDecimal
 import java.util.UUID.randomUUID
 
