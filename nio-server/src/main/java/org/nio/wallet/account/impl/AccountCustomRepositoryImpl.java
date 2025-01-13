@@ -1,5 +1,6 @@
 package org.nio.wallet.account.impl;
 
+import com.datastax.oss.driver.api.core.ConsistencyLevel;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import lombok.RequiredArgsConstructor;
 import org.nio.wallet.account.Account;
@@ -17,13 +18,10 @@ public class AccountCustomRepositoryImpl implements AccountCustomRepository<Acco
 
     @Override
     public Mono<String> insertLite(Account i) {
-        return template.execute(SimpleStatement.newInstance("INSERT INTO " + ACCOUNT_TABLE + "(id, balance) VALUES (?, ?)", i.getId(), i.getBalance()))
-                .map(r -> i.getId());
+        return template.execute(SimpleStatement.newInstance(
+                                "INSERT INTO " + ACCOUNT_TABLE + "(id, balance, version) VALUES (?, ?, ?)",
+                                i.getId(), i.getBalance(), i.getVersion())
+                        .setConsistencyLevel(ConsistencyLevel.ONE))
+                .mapNotNull(r -> i.getId());
     }
-
-//    @Override
-//    public Mono<Void> updateBalance(String id, BigDecimal balance, Long version) {
-//        template.execute(SimpleStatement.newInstance("UPDATE " + ACCOUNT_TABLE + " SET balance = ? WHERE id = ? IF VERSION = ?", balance, id, version));
-//        return null;
-//    }
 }

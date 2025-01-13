@@ -15,6 +15,7 @@ service WalletService {
 
   rpc transfer (TransferRequest) returns (TransferResponse);
   rpc transferStream (stream TransferRequest) returns (stream TransferResponse);
+  rpc subscribeTransfer (SubscribeTransferRequest) returns (stream TransferResponse);
   rpc closeTicket (CloseTicketRequest) returns (CloseTicketResponse);
 
   //  rpc getAllByBalance (GetAllByBalanceRequest) returns (stream GetAllByBalanceResponse);
@@ -46,8 +47,10 @@ enum ErrorCode {
 }
 
 message TransferResponse {
-  string transactionId = 1;
-  string referenceId = 2;
+}
+
+message SubscribeTransferRequest {
+  repeated string userId = 1;
 }
 
 enum CloseTicketStatus{

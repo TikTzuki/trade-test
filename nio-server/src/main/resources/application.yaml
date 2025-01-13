@@ -21,11 +21,14 @@ logging:
   level:
     org.nio: debug
     org.nio.transaction.TranLogger: debug
-    web: error
+    web: info
     org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: debug
-    io.grpc: error
-    reactor.netty: warn
+    io.grpc: info
+    reactor.netty: info
     root: info
+    com.amazon: debug
+    com.amazonaws: debug
+    javax.jms: debug
 management:
   endpoints:
     web:

@@ -16,6 +16,10 @@ ext {
             implementation "org.springframework.boot:spring-boot-starter-data-cassandra-reactive"
             implementation "io.micrometer:micrometer-registry-prometheus"
             implementation "org.springframework.boot:spring-boot-starter-actuator"
+
+            implementation(platform("software.amazon.awssdk:bom:2.27.21"))
+            implementation "software.amazon.awssdk:sqs"
+//            implementation 'com.amazonaws:amazon-sqs-java-messaging-lib:1.0.4'
             implementation "software.aws.mcs:aws-sigv4-auth-cassandra-java-driver-plugin:4.0.6"
 
             compileOnly "org.projectlombok:lombok:1.18.36"

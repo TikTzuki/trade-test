@@ -93,7 +93,6 @@ class GrpcWorkerService @Autowired constructor(
                     logger.error { "Unhandled error $err" }
                 true
             }
-//            .onErrorContinue { a, b -> logger.error { "Error response: $a, $b" } }
             .doOnComplete { logger.info { "Transfer ${userCount * transPerUser} transaction, taken: ${System.currentTimeMillis() - start} ms" } }
             .subscribe()
 

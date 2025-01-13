@@ -18,23 +18,7 @@ public class BankAccountServiceImpl implements AccountService {
     final AccountRepository repository;
 
     @Override
-    public Mono<String> createBankAccount(Account bankAccount) {
+    public Mono<String> createAccount(Account bankAccount) {
         return repository.insertLite(bankAccount);
     }
-
-    @Override
-    public Mono<Account> getBankAccountById(String id) {
-        return Mono.empty();
-    }
-
-    @Override
-    public Mono<Account> depositAmount(String id, BigDecimal amount) {
-        return Mono.empty();
-    }
-
-    @Override
-    public Mono<Account> withdrawAmount(String id, BigDecimal amount) {
-        return Mono.empty();
-    }
-
 }

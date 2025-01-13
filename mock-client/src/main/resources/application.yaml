@@ -18,8 +18,7 @@ management:
         enabled: true
 logging:
   level:
-    web: info
-    io.grpc: info
-    reactor.netty: info
-    org.nio: info
-    org.nio.transaction: warn # log transaction
+    web: off
+    io.grpc: off
+    reactor.netty: off
+    org.nio: debug

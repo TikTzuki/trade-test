@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.core.io.buffer.DefaultDataBufferFactory
-import org.springframework.core.task.VirtualThreadTaskExecutor
 import org.springframework.http.ContentDisposition
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -17,7 +16,6 @@ import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.scheduler.Schedulers
 
 val TRANSFER_RANGE = listOf("1", "5", "10")
 
@@ -46,26 +44,17 @@ class TestController @Autowired constructor(
 
     @PostMapping("/bulk-insert-accounts")
     fun bulkInsertAccounts(@RequestParam number: Int): ResponseEntity<Flux<DataBuffer>> {
-        val reqFlux = Flux.generate({ 0 }, { state, sink ->
-            if (state < number) {
-                sink.next(
-                    CreateAccountRequest.newBuilder()
-                        .setBalance("100")
-                        .build()
-                )
-                state + 1
-            } else {
-                sink.complete()
-                state
-            }
-        })
-            .parallel(3)
-            .runOn(Schedulers.fromExecutor(VirtualThreadTaskExecutor()))
+        val reqFlux = Flux
+            .just(
+                CreateAccountRequest.newBuilder()
+                    .setBalance("100")
+                    .build()
+            )
+            .repeat(number.toLong())
             .flatMap {
                 val resp: Mono<CreateAccountResponse> = stub.createAccount(Mono.just(it))
                 return@flatMap resp
             }
-            .sequential()
 
         val bufferFlux: Flux<DataBuffer> = reqFlux.map {
             val bytes = (it.accountId + "\n").toByteArray(Charsets.UTF_8)

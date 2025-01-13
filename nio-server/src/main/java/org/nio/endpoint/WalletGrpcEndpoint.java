@@ -14,11 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.nio.wallet.account.AccountService;
 import org.nio.wallet.transaction.TransactionService;
+import org.springframework.data.mapping.context.MappingContext;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.UUID;
 
 import static com.nio.wallet.grpc.WalletServiceOuterClass.CloseTicketRequest;
 import static com.nio.wallet.grpc.WalletServiceOuterClass.CloseTicketResponse;
@@ -32,6 +32,7 @@ public class WalletGrpcEndpoint extends ReactorWalletServiceGrpc.WalletServiceIm
     private static final Long TIMEOUT_MILLIS = 5_000L;
     final AccountService bankAccountService;
     final TransactionService transactionService;
+    private final MappingContext mappingContext;
 
     @Override
     public Flux<StringValue> ping(Flux<Empty> request) {
@@ -43,8 +44,7 @@ public class WalletGrpcEndpoint extends ReactorWalletServiceGrpc.WalletServiceIm
 
     @Override
     public Mono<CreateAccountResponse> createAccount(Mono<CreateAccountRequest> request) {
-        return request.flatMap(req -> bankAccountService.createBankAccount(MapperKt.of(req))
-                        .doOnNext(v -> log.debug("span req {}", req)))
+        return request.flatMap(req -> bankAccountService.createAccount(MapperKt.of(req))
                 .map(bankAccount -> CreateAccountResponse.newBuilder()
                         .setAccountId(bankAccount)
                         .build())
@@ -52,29 +52,22 @@ public class WalletGrpcEndpoint extends ReactorWalletServiceGrpc.WalletServiceIm
                 .doOnError(ex -> {
                     log.error(ex.getMessage(), ex);
                 })
-                .doOnSuccess(result -> log.debug("created account: {}", result.getAccountId()));
+                .doOnSuccess(result -> log.debug("created account: {}", result.getAccountId())));
     }
 
     @Override
     public Flux<TransferResponse> transferStream(Flux<TransferRequest> request) {
         return request
                 .flatMap(transactionService::transfer)
-                .map(newTran -> TransferResponse.newBuilder()
-                        .setTransactionId(newTran.getId())
-                        .setReferenceId(newTran.getRefId())
-                        .build())
-                .doOnNext(result -> log.debug("Write success tran: {}", result))
+                .map(_ -> TransferResponse.getDefaultInstance())
                 .timeout(Duration.ofMillis(TIMEOUT_MILLIS));
     }
 
     @Override
     public Mono<TransferResponse> transfer(Mono<TransferRequest> request) {
         return request
-//                .flatMap(transactionService::transfer)
-                .map(newTran -> TransferResponse.newBuilder()
-                        .setTransactionId(UUID.randomUUID().toString())
-                        .setReferenceId(newTran.getReferenceId())
-                        .build())
+                .flatMap(transactionService::transfer)
+                .then(Mono.fromCallable(TransferResponse::getDefaultInstance))
                 .timeout(Duration.ofMillis(TIMEOUT_MILLIS))
                 .doOnError(ex -> {
                     log.error(ex.getMessage(), ex);
