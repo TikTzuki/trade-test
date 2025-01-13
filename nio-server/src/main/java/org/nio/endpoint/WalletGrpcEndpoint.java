@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.nio.wallet.account.AccountService;
 import org.nio.wallet.transaction.impl.TransactionServiceImpl;
-import org.springframework.data.mapping.context.MappingContext;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -32,7 +31,6 @@ public class WalletGrpcEndpoint extends ReactorWalletServiceGrpc.WalletServiceIm
     private static final Long TIMEOUT_MILLIS = 5_000L;
     final AccountService bankAccountService;
     final TransactionServiceImpl transactionService;
-    private final MappingContext mappingContext;
 
     @Override
     public Flux<StringValue> ping(Flux<Empty> request) {
@@ -93,19 +91,5 @@ public class WalletGrpcEndpoint extends ReactorWalletServiceGrpc.WalletServiceIm
         }).map(req -> WithdrawResponse.newBuilder()
                 .build());
     }
-    //    private <T> T validate(T data) {
-//        var errors = validator.validate(data);
-//        if (!errors.isEmpty()) throw new ConstraintViolationException(errors);
-//        return data;
-//    }
-//
-//    private void spanTag(String key, String value) {
-//        var span = tracer.currentSpan();
-//        if (span != null) span.tag(key, value);
-//    }
-//
-//    private void spanError(Throwable ex) {
-//        var span = tracer.currentSpan();
-//        if (span != null) span.error(ex);
-//    }
+
 }

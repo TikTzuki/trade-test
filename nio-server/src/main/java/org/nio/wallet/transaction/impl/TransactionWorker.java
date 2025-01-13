@@ -33,22 +33,7 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 public class TransactionWorker {
     final SqsClient sqsClient;
     final TransactionServiceImpl transactionService;
-    //    final MessageProducer producer;
-    ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
-
-//    @Bean
-//    public MessageConsumer transactionConsumer(Connection connection, Session session) throws JMSException {
-//        var queue = session.createQueue(QUEUE_NAME);
-//        var consumer = session.createConsumer(queue);
-//        consumer.setMessageListener(this);
-//
-//        connection.start();
-//        Message msg = consumer.receive(TimeUnit.MINUTES.toMillis(1));
-//        log.debug("Received message: {}", msg);
-//        if(msg!=null)
-//            msg.acknowledge();
-//        return consumer;
-//    }
+    final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 
     @PostConstruct
     public void init() {
@@ -109,21 +94,4 @@ public class TransactionWorker {
         executorService.awaitTermination(1, MINUTES);
     }
 
-//    @Override
-//    public void onMessage(Message message) {
-//        log.debug("Received message: {}", message);
-//        BytesMessage m = (BytesMessage) message;
-//        try {
-//            byte[] bytes = new byte[(int) m.getBodyLength()];
-//            m.readBytes(bytes);
-//            TransferRequest request = TransferRequest.parseFrom(bytes);
-//            log.debug("Received message: {}", request);
-//            transactionService.persistTransaction(request);
-//            message.acknowledge();
-//        } catch (JMSException e) {
-//            // TODO: handle fail request
-//            log.debug("Failed to parse message: {}", message);
-//            e.printStackTrace();
-//        }
-//    }
 }

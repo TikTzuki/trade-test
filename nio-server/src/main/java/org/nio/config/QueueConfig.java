@@ -28,30 +28,4 @@ public class QueueConfig {
         return client;
     }
 
-//    @Bean
-//    public SQSConnectionFactory connectionFactory() {
-//        return new SQSConnectionFactory(
-//                new ProviderConfiguration(),
-//                AmazonSQSClientBuilder.standard()
-//                        .withRegion(AP_SOUTHEAST_1.getName())
-//        );
-//    }
-//
-//    @Bean
-//    public Connection connection(SQSConnectionFactory connectionFactory) throws JMSException {
-//        return connectionFactory.createConnection();
-//    }
-//
-//    @Bean
-//    public Session session(Connection connection) throws JMSException {
-//        return connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-//    }
-//
-//    @Bean
-//    public MessageProducer transactionProducer(Session session) throws JMSException {
-//        var queue = session.createQueue(QUEUE_NAME);
-//        return session.createProducer(queue);
-//    }
-
-
 }
