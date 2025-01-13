@@ -26,9 +26,10 @@ logging:
     io.grpc: info
     reactor.netty: info
     root: info
-    com.amazon: debug
+    com.amazon: info
     com.amazonaws: debug
     javax.jms: debug
+    com.datastax: off
 management:
   endpoints:
     web:

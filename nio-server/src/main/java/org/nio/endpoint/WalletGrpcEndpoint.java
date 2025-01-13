@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.nio.wallet.account.AccountService;
-import org.nio.wallet.transaction.TransactionService;
+import org.nio.wallet.transaction.impl.TransactionServiceImpl;
 import org.springframework.data.mapping.context.MappingContext;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,7 +31,7 @@ import static com.nio.wallet.grpc.WalletServiceOuterClass.TransferResponse;
 public class WalletGrpcEndpoint extends ReactorWalletServiceGrpc.WalletServiceImplBase {
     private static final Long TIMEOUT_MILLIS = 5_000L;
     final AccountService bankAccountService;
-    final TransactionService transactionService;
+    final TransactionServiceImpl transactionService;
     private final MappingContext mappingContext;
 
     @Override

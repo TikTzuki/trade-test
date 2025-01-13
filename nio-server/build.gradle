@@ -19,6 +19,9 @@ ext {
 
             implementation(platform("software.amazon.awssdk:bom:2.27.21"))
             implementation "software.amazon.awssdk:sqs"
+            implementation "jakarta.xml.bind:jakarta.xml.bind-api"
+            implementation "org.glassfish.jaxb:jaxb-runtime"
+            implementation 'javax.xml.bind:jaxb-api:2.3.1'
 //            implementation 'com.amazonaws:amazon-sqs-java-messaging-lib:1.0.4'
             implementation "software.aws.mcs:aws-sigv4-auth-cassandra-java-driver-plugin:4.0.6"
 
