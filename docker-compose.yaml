@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  nio-server:
+    image: tiktuzki/nio-server:latest
+    container_name: nio-server
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    environment:
+      - JAVA_OPTS=--enable-preview
+    volumes:
+      - ./nio-server/config:/workspace/config
+      - ./nio-server/.aws:/root/.aws
+      - ./nio-server/log:/workspace/log
+
+  nio-client:
+    image: tiktuzki/nio-client:latest
+    container_name: nio-client
+    depends_on:
+      - nio-server
+    volumes:
+      - ~/nio-client/config:/workspace/config
+      - ./nio-client/log:/workspace/log
