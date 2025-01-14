@@ -2,6 +2,7 @@ grpc:
   server:
     port: 9090
     reflection-service-enabled: true
+    keep-alive-timeout: 20s
 spring:
   main:
     web-application-type: reactive
@@ -35,3 +36,5 @@ management:
         include: [ "*" ]
 server:
   port: 8081
+sqs:
+  name: nio-lab

@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-val TRANSFER_RANGE = listOf("1", "5", "10")
-
 @RestController
 @RequestMapping("/api/v1/wallet")
 class TestController @Autowired constructor(

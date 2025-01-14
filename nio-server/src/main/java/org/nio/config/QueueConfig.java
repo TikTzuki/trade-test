@@ -13,8 +13,8 @@ import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
 @Configuration
 @RequiredArgsConstructor
 public class QueueConfig {
-    public final static String QUEUE_NAME = "nio-lab";
     public static String QUEUE_URL;
+    final QueueConfigProperties properties;
 
     @Bean
     public SqsClient sqsClient() {
@@ -23,9 +23,13 @@ public class QueueConfig {
                 .credentialsProvider(ProfileCredentialsProvider.create())
                 .build();
         QUEUE_URL = client.getQueueUrl(GetQueueUrlRequest.builder()
-                .queueName(QueueConfig.QUEUE_NAME)
+                .queueName(getQueueName())
                 .build()).queueUrl();
         return client;
+    }
+
+    public String getQueueName() {
+        return properties.getName();
     }
 
 }
