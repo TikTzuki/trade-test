@@ -3,12 +3,6 @@ package org.nio.endpoint;
 import com.google.protobuf.Empty;
 import com.google.protobuf.StringValue;
 import com.nio.wallet.grpc.ReactorWalletServiceGrpc;
-import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountRequest;
-import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountResponse;
-import com.nio.wallet.grpc.WalletServiceOuterClass.GetAccountByIdRequest;
-import com.nio.wallet.grpc.WalletServiceOuterClass.GetAccountByIdResponse;
-import com.nio.wallet.grpc.WalletServiceOuterClass.WithdrawRequest;
-import com.nio.wallet.grpc.WalletServiceOuterClass.WithdrawResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -19,10 +13,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
-import static com.nio.wallet.grpc.WalletServiceOuterClass.CloseTicketRequest;
-import static com.nio.wallet.grpc.WalletServiceOuterClass.CloseTicketResponse;
-import static com.nio.wallet.grpc.WalletServiceOuterClass.TransferRequest;
-import static com.nio.wallet.grpc.WalletServiceOuterClass.TransferResponse;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.*;
 
 @Slf4j
 @GrpcService

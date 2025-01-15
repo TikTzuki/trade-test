@@ -1,10 +1,10 @@
 package org.nio.account.impl;
 
-import com.datastax.oss.driver.api.core.ConsistencyLevel;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import lombok.RequiredArgsConstructor;
 import org.nio.account.Account;
 import org.nio.account.AccountCustomRepository;
+import org.nio.config.CassandraConfig;
 import org.springframework.data.cassandra.core.ReactiveCassandraTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -21,7 +21,7 @@ public class AccountCustomRepositoryImpl implements AccountCustomRepository<Acco
         return template.execute(SimpleStatement.newInstance(
                                 "INSERT INTO " + ACCOUNT_TABLE + "(id, balance, version) VALUES (?, ?, ?)",
                                 i.getId(), i.getBalance(), i.getVersion())
-                        .setConsistencyLevel(ConsistencyLevel.ONE))
+                        .setConsistencyLevel(CassandraConfig.DEFAULT_WRITE_CONSISTENCY))
                 .mapNotNull(r -> i.getId());
     }
 }

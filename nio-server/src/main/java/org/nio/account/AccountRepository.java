@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 
 public interface AccountRepository extends ReactiveCassandraRepository<Account, String>, AccountCustomRepository<Account, String> {
     @Query("UPDATE account SET balance = :balance, version = :newVersion WHERE id = :id IF VERSION = :version")
+    @Consistency(DefaultConsistencyLevel.LOCAL_QUORUM)
     Mono<Boolean> updateBalance(@Param("id") String id, @Param("balance") BigDecimal balance, @Param("newVersion") Long newVersion, @Param("version") Long version);
 
     @Query("SELECT balance, version FROM account WHERE id = :id")
