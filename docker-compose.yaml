@@ -1,5 +1,4 @@
-version: '3.8'
-
+name: nio-lab
 services:
   nio-server:
     image: tiktuzki/nio-server:latest
