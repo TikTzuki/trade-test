@@ -16,8 +16,10 @@ services:
   nio-client:
     image: tiktuzki/nio-client:latest
     container_name: nio-client
-    depends_on:
-      - nio-server
+    ports:
+      - "8080:8080"
+    environment:
+      - JAVA_OPTS=--enable-preview
     volumes:
       - ~/nio-client/config:/workspace/config
       - ./nio-client/log:/workspace/log
