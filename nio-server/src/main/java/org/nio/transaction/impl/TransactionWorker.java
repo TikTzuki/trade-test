@@ -7,6 +7,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nio.config.QueueConfig;
+import org.nio.config.TransactionConfig;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,7 +15,6 @@ import reactor.core.publisher.SynchronousSink;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.*;
 
-import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -30,13 +30,14 @@ public class TransactionWorker {
     final SqsClient sqsClient;
     final TransactionServiceImpl transactionService;
     final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+    final TransactionConfig transactionConfig;
 
     @PostConstruct
     public void init() {
         ReceiveMessageRequest receiveMessageRequest = ReceiveMessageRequest.builder()
                 .queueUrl(QueueConfig.QUEUE_URL)
                 .messageAttributeNames("grpc")
-                .waitTimeSeconds(20)
+                .waitTimeSeconds((int) transactionConfig.getReceiveMessageWaitTime().toSeconds())
                 .build();
 
         executorService.submit(() -> {
@@ -67,7 +68,7 @@ public class TransactionWorker {
                                 ? transactionService.persistTransaction(request).thenReturn(message)
                                 : Mono.empty(); //FIXME: Not delete fail message
                     })
-                    .bufferTimeout(10, Duration.ofSeconds(50))
+                    .bufferTimeout(transactionConfig.getBufferSize(), transactionConfig.getBufferTime())
                     .doOnNext(batch -> {
                         var entries = batch.stream()
                                 .peek(message -> log.debug("Delete message: {}", message.messageId()))

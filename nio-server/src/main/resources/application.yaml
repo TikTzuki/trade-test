@@ -17,6 +17,7 @@ spring:
     config: classpath:cassandra-application.conf
     request:
       consistency: one
+      serial-consistency: one
   threads:
     virtual:
       enabled: true
@@ -40,3 +41,7 @@ server:
   port: 8081
 sqs:
   name: nio-lab
+transaction:
+  receive-message-wait-time: 20s
+  buffer-size: 10
+  buffer-time: 50s
