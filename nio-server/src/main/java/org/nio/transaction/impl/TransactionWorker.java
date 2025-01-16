@@ -38,6 +38,7 @@ public class TransactionWorker {
                 .queueUrl(QueueConfig.QUEUE_URL)
                 .messageAttributeNames("grpc")
                 .waitTimeSeconds((int) transactionConfig.getReceiveMessageWaitTime().toSeconds())
+                .maxNumberOfMessages(transactionConfig.getNumberOfMessages())
                 .build();
 
         executorService.submit(() -> {
