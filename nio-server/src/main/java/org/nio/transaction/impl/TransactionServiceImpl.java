@@ -69,7 +69,7 @@ public class TransactionServiceImpl {
                         return Mono.error(new InsufficientBalance(request.getReferenceId()));
                     }
                     log.debug("Transfer success: {}", success);
-                    return repository.insertLite(
+                    return repository.insert(
                                     new Transaction(
                                             id, accountId,
                                             Instant.now(),

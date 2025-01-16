@@ -16,7 +16,7 @@ spring:
     schema-action: create_if_not_exists
     config: classpath:cassandra-application.conf
     request:
-      consistency: one
+      consistency: local_quorum
       serial-consistency: one
   threads:
     virtual:
@@ -30,6 +30,7 @@ logging:
     reactor.netty: off
     com.amazon: off
     com.datastax: off
+    software.amazon: off
     web: info
     root: info
 management:

@@ -25,9 +25,10 @@ fun SqsClient.publish(msgs: List<TransferRequest>) {
             .build()
     }
     logger.debug(
-        "Prepare batch: {} - {}",
+        "Prepare batch: {} - {} - entries: {}",
         System.currentTimeMillis() - startBatch,
-        entries.size
+        entries.size,
+        entries
     )
     this.sendMessageBatch(
         SendMessageBatchRequest.builder()
