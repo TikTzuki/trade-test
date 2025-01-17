@@ -26,4 +26,4 @@ curl -O $CONFIG_REPO/keyspaces-application.conf --output-dir ./nio-server/config
 curl -O $CONFIG_REPO/cassandra_truststore.jks --output-dir ./nio-server/config
 curl -O $CONFIG_REPO/credentials --output-dir ./nio-server/.aws
 
-/usr/local/bin/docker-compose up -d nio-server
+/usr/local/bin/docker-compose up -d nio-server-<ARM/None>
