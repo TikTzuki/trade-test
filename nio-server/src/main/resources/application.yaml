@@ -29,8 +29,8 @@ logging:
     io.grpc: off
     reactor.netty: off
     com.amazon: off
-    com.datastax: off
     software.amazon: off
+    com.datastax: off
     web: info
     root: info
 management:
@@ -41,6 +41,7 @@ management:
 server:
   port: 8081
 sqs:
+  region: ap-southeast-1
   name: nio-lab
   url: http://sqs.ap-southeast-1.amazonaws.com/730335282524/nio-lab
 transaction:

@@ -6,8 +6,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
+
+import java.net.URISyntaxException;
+import java.util.Objects;
 
 @Slf4j
 @Configuration
@@ -17,24 +19,19 @@ public class QueueConfig implements InitializingBean {
     final QueueConfigProperties properties;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        QUEUE_URL = getQueueUrl();
+    public void afterPropertiesSet() {
+        QUEUE_URL = properties.getUrl();
     }
 
     @Bean
-    public SqsClient sqsClient() {
-        return SqsClient.builder()
-                .region(Region.AP_SOUTHEAST_1)
-                .credentialsProvider(ProfileCredentialsProvider.create())
-                .build();
-    }
-
-    public String getQueueName() {
-        return properties.getName();
-    }
-
-    public String getQueueUrl() {
-        return properties.getUrl();
+    public SqsClient sqsClient() throws URISyntaxException {
+        var builder = SqsClient.builder()
+                .region(properties.getRegion())
+                .credentialsProvider(ProfileCredentialsProvider.create());
+        if (Objects.nonNull(properties.getUrlEndpoint())) {
+            builder.endpointOverride(properties.getUrlEndpoint().toURI());
+        }
+        return builder.build();
     }
 
 }
