@@ -17,20 +17,20 @@ spring:
     config: classpath:cassandra-application.conf
     request:
       consistency: local_quorum
-      serial-consistency: one
+      serial-consistency: local_serial
   threads:
     virtual:
       enabled: true
 logging:
   level:
-    org.nio: info
+    org.nio: error
     org.nio.transaction.TranLogger: error
-    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: off
-    io.grpc: off
+    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: error
+    io.grpc: error
     reactor.netty: off
-    com.amazon: off
-    software.amazon: off
-    com.datastax: off
+    com.amazon: error
+    software.amazon: error
+    com.datastax: error
     web: info
     root: info
 management:

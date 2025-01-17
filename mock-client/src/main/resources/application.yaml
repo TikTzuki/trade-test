@@ -19,6 +19,6 @@ management:
 logging:
   level:
     web: off
-    io.grpc: off
+    io.grpc: error
     reactor.netty: off
-    org.nio: debug
+    org.nio: info

@@ -25,8 +25,7 @@ class TestController @Autowired constructor(
     val workerService: GrpcWorkerService
 ) {
     @PostMapping("/ping")
-    fun test(): String {
-//        val stub = ReactorBankAccountServiceGrpc.newReactorStub(null)
+    fun test(): Flux<String> {
         val f = Flux.generate({ 0 }, { state, sink ->
             if (state < 10) {
                 sink.next(Empty.getDefaultInstance())
@@ -36,8 +35,7 @@ class TestController @Autowired constructor(
                 state
             }
         })
-        stub.ping(f).subscribe { println(it) }
-        return "Hello, World!"
+        return stub.ping(f).map { it.value };
     }
 
     @PostMapping("/bulk-insert-accounts")
@@ -69,7 +67,7 @@ class TestController @Autowired constructor(
     @PostMapping("/bulk-transfers", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun bulkTransfers(
         @RequestParam parallel: Int,
-        @RequestParam userCount: Long,
+        @RequestParam userCount: Int,
         @RequestParam transactionPerUser: Int,
         @RequestParam enableStream: Boolean,
         @RequestPart("file")
@@ -82,8 +80,8 @@ class TestController @Autowired constructor(
                         reader.readLines()
                     }
             }.block()!!
-        workerService.startRun(accountIds, userCount, transactionPerUser, enableStream)
-        return "Hello, World!"
+        workerService.startRun(accountIds, parallel, userCount, transactionPerUser, enableStream)
+        return "Bulk Transfer!"
     }
 
     @GetMapping("/stop-transfers")

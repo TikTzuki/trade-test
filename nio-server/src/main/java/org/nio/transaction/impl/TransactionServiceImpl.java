@@ -37,7 +37,7 @@ public class TransactionServiceImpl {
                     }
                     return Flux.empty();
                 })
-                .doOnComplete(() -> log.info("Transfer complete: {}", System.currentTimeMillis() - start))
+                .doOnComplete(() -> log.info("Prepare complete: {}", System.currentTimeMillis() - start))
                 .thenMany(Flux.empty());
     }
 
@@ -100,6 +100,5 @@ public class TransactionServiceImpl {
                     default -> false;
                 }, (origin, e) -> {
                 });
-
     }
 }

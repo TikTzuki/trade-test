@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -42,12 +43,15 @@ public class TransactionWorker {
                 .build();
 
         executorService.submit(() -> {
-            log.info("Worker is running");
+            log.info("Worker started");
+
             Callable<Long> initState = () -> 0L;
             BiFunction<Long, SynchronousSink<Long>, Long> infinityMessageGenerator = (i, sink) -> {
                 sink.next(i);
                 return i;
             };
+            AtomicLong start = new AtomicLong(System.currentTimeMillis());
+            AtomicLong count = new AtomicLong();
             Flux.generate(initState, infinityMessageGenerator)
                     .flatMap(i -> {
                         ReceiveMessageResponse sqsMessages = sqsClient.receiveMessage(receiveMessageRequest); // Block generator until has message
@@ -83,6 +87,14 @@ public class TransactionWorker {
                                 .build());
                     })
                     .subscribe(result -> {
+                        start.set(System.currentTimeMillis());
+                        count.addAndGet(result.size());
+                        if (count.get() >= 1_00_000) {
+                            var now = System.currentTimeMillis();
+                            log.info("Process {} messages in {} ms", count.get(), now - start.get());
+                            start.set(now);
+                            count.set(0);
+                        }
                     });
         });
     }
