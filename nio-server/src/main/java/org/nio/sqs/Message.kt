@@ -19,6 +19,7 @@ fun SqsClient.publish(msgs: List<TransferRequest>) {
             .dataType("Binary")
             .build()
         return@map SendMessageBatchRequestEntry.builder()
+            .messageGroupId(it.userId)
             .messageAttributes(mapOf("grpc" to metadata))
             .id(it.referenceId)
             .messageBody(it.javaClass.name)
