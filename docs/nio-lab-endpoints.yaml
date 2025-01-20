@@ -1,0 +1,67 @@
+---
+Metadata:
+  AWSToolsMetrics:
+    IaC_Generator: "arn:aws:cloudformation:ap-southeast-1:730335282524:generatedTemplate/ae2acac9-32fd-41ee-bdd7-00d991b9a953"
+Resources:
+  EC2VPCEndpoint00vpce0b9702815484ad5e800EovjA:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::VPCEndpoint"
+    DeletionPolicy: "Delete"
+    Properties:
+      PrivateDnsEnabled: true
+      IpAddressType: "ipv4"
+      DnsOptions:
+        PrivateDnsOnlyForInboundResolverEndpoint: "NotSpecified"
+        DnsRecordIpType: "ipv4"
+      ResourceConfigurationArn: ""
+      SecurityGroupIds:
+      - "sg-09c396e7701b47867"
+      SubnetIds:
+      - "subnet-0129b89b46289c74f"
+      - "subnet-037c0d407a9a44935"
+      - "subnet-05295d39fb3c70ac1"
+      ServiceNetworkArn: ""
+      VpcId: "vpc-0e56e76b69f73d8c1"
+      RouteTableIds: []
+      ServiceName: "com.amazonaws.ap-southeast-1.cassandra"
+      PolicyDocument:
+        Statement:
+        - Resource: "*"
+          Action: "*"
+          Effect: "Allow"
+          Principal: "*"
+      VpcEndpointType: "Interface"
+      Tags:
+      - Value: "keyspaces"
+        Key: "Name"
+  EC2VPCEndpoint00vpce0c70bdc81de41287300cO2V6:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::VPCEndpoint"
+    DeletionPolicy: "Delete"
+    Properties:
+      PrivateDnsEnabled: true
+      IpAddressType: "ipv4"
+      DnsOptions:
+        PrivateDnsOnlyForInboundResolverEndpoint: "NotSpecified"
+        DnsRecordIpType: "ipv4"
+      ResourceConfigurationArn: ""
+      SecurityGroupIds:
+      - "sg-09c396e7701b47867"
+      SubnetIds:
+      - "subnet-0129b89b46289c74f"
+      - "subnet-053f790e5c13c46ed"
+      - "subnet-037c0d407a9a44935"
+      ServiceNetworkArn: ""
+      VpcId: "vpc-0e56e76b69f73d8c1"
+      RouteTableIds: []
+      ServiceName: "com.amazonaws.ap-southeast-1.sqs"
+      PolicyDocument:
+        Statement:
+        - Resource: "*"
+          Action: "*"
+          Effect: "Allow"
+          Principal: "*"
+      VpcEndpointType: "Interface"
+      Tags:
+      - Value: "sqs-endpoint"
+        Key: "Name"

@@ -1,0 +1,16 @@
+Metadata:
+  AWSToolsMetrics:
+    IaC_Generator: arn:aws:cloudformation:ap-southeast-1:730335282524:generatedTemplate/d7b0097a-88af-4504-87e6-64e49cc227e8
+Resources:
+  EC2InstanceConnectEndpoint00eice0c80cdcd44ec8dcde001Oknn:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::InstanceConnectEndpoint
+    DeletionPolicy: Delete
+    Properties:
+      PreserveClientIp: false
+      SubnetId: subnet-037c0d407a9a44935
+      SecurityGroupIds:
+        - sg-09c396e7701b47867
+      Tags:
+        - Value: ec2-connect-endpoint
+          Key: Name

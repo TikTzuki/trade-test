@@ -1,0 +1,42 @@
+Metadata:
+  AWSToolsMetrics:
+    IaC_Generator: arn:aws:cloudformation:ap-southeast-1:730335282524:generatedTemplate/ae6492da-c91a-4004-9a6b-3e1db46909e6
+Resources:
+  EC2RouteToNatGateway1a:
+    UpdateReplacePolicy: Delete
+    Type: AWS::EC2::Route
+    DeletionPolicy: Delete
+    Properties:
+      NatGatewayId: !Ref EC2NatGateway00nat0558cc8d18c8e6bcd00I0YOZ
+      RouteTableId: rtb-099985f923cac1f83
+      DestinationCidrBlock: 0.0.0.0/0
+  EC2RouteToNatGateway1b:
+    UpdateReplacePolicy: Delete
+    Type: AWS::EC2::Route
+    DeletionPolicy: Delete
+    Properties:
+      NatGatewayId: !Ref EC2NatGateway00nat0558cc8d18c8e6bcd00I0YOZ
+      RouteTableId: rtb-04539fcf19d12fbca
+      DestinationCidrBlock: 0.0.0.0/0
+  EC2RouteToNatGateway1c:
+    UpdateReplacePolicy: Delete
+    Type: AWS::EC2::Route
+    DeletionPolicy: Delete
+    Properties:
+      NatGatewayId: !Ref EC2NatGateway00nat0558cc8d18c8e6bcd00I0YOZ
+      RouteTableId: rtb-04927866b0afb5f7d
+      DestinationCidrBlock: 0.0.0.0/0
+  EC2NatGateway00nat0558cc8d18c8e6bcd00I0YOZ:
+    UpdateReplacePolicy: Delete
+    Type: AWS::EC2::NatGateway
+    DeletionPolicy: Delete
+    Properties:
+      PrivateIpAddress: 10.0.13.67
+      ConnectivityType: public
+#      VpcId: vpc-0e56e76b69f73d8c1
+#      EniId: eni-07b1d008c7fb53a72
+      AllocationId: eipalloc-0d8fe9e00692d5bf7
+      SubnetId: subnet-0d190a2df85358813
+      Tags:
+        - Value: nio-nat
+          Key: Name
