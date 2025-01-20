@@ -30,6 +30,7 @@ ext {
             // Test
             testImplementation "org.junit.jupiter:junit-jupiter"
             testImplementation "org.testng:testng:7.10.2"
+            runtimeOnly 'io.grpc:grpc-census'
         }
         dependencyManagement {
             imports {

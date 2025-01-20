@@ -33,6 +33,7 @@ ext {
             implementation 'net.devh:grpc-server-spring-boot-starter:3.1.0.RELEASE'
             implementation "com.salesforce.servicelibs:reactor-grpc-stub:1.2.4"
             implementation 'org.springframework.grpc:spring-grpc-core'
+            runtimeOnly 'io.grpc:grpc-census'
 
             // Test
             testImplementation "org.junit.jupiter:junit-jupiter"

@@ -25,12 +25,12 @@ logging:
   level:
     org.nio: error
     org.nio.transaction.TranLogger: error
-    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: error
+    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: ${LOG_CASSANDRA:error}
     io.grpc: error
     reactor.netty: off
-    com.amazon: error
-    software.amazon: error
-    com.datastax: error
+    com.amazon: ${LOG_AWS:info}
+    software.amazon: ${LOG_AWS:info}
+    com.datastax: ${LOG_CASSANDRA:error}
     web: info
     root: info
 management:
@@ -39,7 +39,7 @@ management:
       exposure:
         include: [ "*" ]
 server:
-  port: 8081
+  port: 8080
 sqs:
   region: ap-southeast-1
   name: nio-lab

@@ -9,5 +9,6 @@ COPY --from=builder spring-boot-loader /workspace
 COPY --from=builder dependencies /workspace
 COPY --from=builder snapshot-dependencies /workspace
 COPY --from=builder application /workspace
+COPY .aws /root/.aws
 ENV JAVA_OPTS=--enable-preview
 ENTRYPOINT java "$JAVA_OPTS" org.springframework.boot.loader.launch.JarLauncher
