@@ -46,7 +46,7 @@ class TestController @Autowired constructor(
                     .setBalance("100")
                     .build()
             )
-            .repeat(number.toLong())
+            .repeat(number.toLong() - 1)
             .flatMap {
                 val resp: Mono<CreateAccountResponse> = stub.createAccount(Mono.just(it))
                 return@flatMap resp

@@ -19,16 +19,26 @@ enum class TransactionAction {
     WIN,
 }
 
+@Table("transaction_by_account")
+data class TransactionByAccount(
+    @PrimaryKeyColumn(type = PARTITIONED)
+    val accountId: String,
+
+    val transactionId: String,
+
+    @PrimaryKeyColumn(type = CLUSTERED, ordering = DESCENDING)
+    val timeStamp: Instant,
+)
+
 @Table("transaction")
 data class Transaction(
     @PrimaryKeyColumn(type = PARTITIONED)
     val id: String,
 
-    @PrimaryKeyColumn(type = PARTITIONED)
-    val accountId: String,
-
     @PrimaryKeyColumn(type = CLUSTERED, ordering = DESCENDING)
     val timeStamp: Instant,
+
+    val accountId: String,
 
     val ticketId: String,
 

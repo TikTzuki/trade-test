@@ -5,7 +5,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nio.account.AccountRepository;
 import org.nio.sqs.MessageKt;
-import org.nio.transaction.*;
+import org.nio.transaction.InsertTransactionFail;
+import org.nio.transaction.InsufficientBalance;
+import org.nio.transaction.NewTransaction;
+import org.nio.transaction.TranLogger;
+import org.nio.transaction.Transaction;
+import org.nio.transaction.TransactionAction;
+import org.nio.transaction.TransactionRepository;
+import org.nio.transaction.TransactionType;
+import org.nio.transaction.VersionConflict;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,7 +58,8 @@ public class TransactionServiceImpl {
         return accountRepository
                 .getAccountBalance(accountId)
                 .doOnNext(balanceAndVersion -> {
-                    if (balanceAndVersion.balance().compareTo(amount) >= 0)
+                    log.debug("Balance: {}", balanceAndVersion.balance());
+                    if (balanceAndVersion.balance().compareTo(amount) <= 0)
                         throw new InsufficientBalance(request.getReferenceId());
                 })
                 .flatMap(balanceAndVersion -> accountRepository.updateBalance(
@@ -68,20 +77,20 @@ public class TransactionServiceImpl {
                     if (!success) {
                         return Mono.error(new InsufficientBalance(request.getReferenceId()));
                     }
-                    log.debug("Transfer success: {}", success);
-                    return repository.insert(
-                                    new Transaction(
-                                            id, accountId,
-                                            Instant.now(),
-                                            ticketId,
-                                            TransactionType.WITHDRAW,
-                                            TransactionAction.BET,
-                                            request.getReferenceId(),
-                                            amount,
-                                            BigDecimal.ZERO,
-                                            1
-                                    ))
-                            .map(t -> new NewTransaction(t.getId(), t.getRefId()));
+                    log.debug("Update balance success: {}", success);
+                    return repository.insertBatch(
+                            new Transaction(
+                                    id,
+                                    Instant.now(),
+                                    accountId,
+                                    ticketId,
+                                    TransactionType.WITHDRAW,
+                                    TransactionAction.BET,
+                                    request.getReferenceId(),
+                                    amount,
+                                    BigDecimal.ZERO,
+                                    1
+                            ));
                 })
                 .onErrorMap(origin -> {
                     log.error("Write transaction fail", origin);
@@ -99,6 +108,7 @@ public class TransactionServiceImpl {
                     case InsertTransactionFail e -> true;
                     default -> false;
                 }, (origin, e) -> {
+                    log.error("Write transaction fail {}", e, origin);
                 });
     }
 }

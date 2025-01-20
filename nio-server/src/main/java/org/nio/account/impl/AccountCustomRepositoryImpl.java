@@ -1,15 +1,12 @@
 package org.nio.account.impl;
 
-import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import lombok.RequiredArgsConstructor;
 import org.nio.account.Account;
 import org.nio.account.AccountCustomRepository;
-import org.nio.config.CassandraConfig;
 import org.springframework.data.cassandra.core.ReactiveCassandraTemplate;
+import org.springframework.data.cassandra.core.cql.WriteOptions;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import static org.nio.account.AccountKt.ACCOUNT_TABLE;
 
 @Component
 @RequiredArgsConstructor
@@ -18,10 +15,9 @@ public class AccountCustomRepositoryImpl implements AccountCustomRepository<Acco
 
     @Override
     public Mono<String> insertLite(Account i) {
-        return template.execute(SimpleStatement.newInstance(
-                                "INSERT INTO " + ACCOUNT_TABLE + "(id, balance, version) VALUES (?, ?, ?)",
-                                i.getId(), i.getBalance(), i.getVersion())
-                        .setConsistencyLevel(CassandraConfig.DEFAULT_WRITE_CONSISTENCY))
+        var statement = template.getStatementFactory().insert(i, WriteOptions.builder()
+                .build()).build();
+        return template.execute(statement)
                 .mapNotNull(r -> i.getId());
     }
 }

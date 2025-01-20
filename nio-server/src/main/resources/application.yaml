@@ -43,7 +43,7 @@ server:
 sqs:
   region: ap-southeast-1
   name: nio-lab
-  url: http://sqs.ap-southeast-1.amazonaws.com/730335282524/nio-lab
+  url: https://sqs.ap-southeast-1.amazonaws.com/730335282524/nio-lab
 transaction:
   receive-message-wait-time: 20s
   buffer-size: 10
