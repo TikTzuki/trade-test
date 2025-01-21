@@ -13,7 +13,16 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
-import static com.nio.wallet.grpc.WalletServiceOuterClass.*;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.CloseTicketRequest;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.CloseTicketResponse;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountRequest;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountResponse;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.GetAccountByIdRequest;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.GetAccountByIdResponse;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.TransferRequest;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.TransferResponse;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.WithdrawRequest;
+import static com.nio.wallet.grpc.WalletServiceOuterClass.WithdrawResponse;
 
 @Slf4j
 @GrpcService

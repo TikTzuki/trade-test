@@ -1,7 +1,6 @@
 package org.nio.account;
 
 import com.datastax.oss.driver.api.core.DefaultConsistencyLevel;
-import jakarta.annotation.Nullable;
 import org.springframework.data.cassandra.repository.Consistency;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;

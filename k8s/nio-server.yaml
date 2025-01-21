@@ -58,50 +58,75 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: nio-server
-  namespace: nio-server
+  namespace: nio-lab
 data:
   application.yaml: |-
     grpc:
       server:
         port: 9090
         reflection-service-enabled: true
+        keep-alive-timeout: 20s
     spring:
       main:
-        web-application-type: none
+        web-application-type: reactive
       cassandra:
         keyspace-name: nio_lab
         schema-action: create_if_not_exists
-        config: cassandra-application.conf
+        config: classpath:cassandra-application.conf
+        request:
+          consistency: local_quorum
+          serial-consistency: local_serial
       threads:
         virtual:
           enabled: true
     logging:
       level:
-        web: warn
-        org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: error
-        root: warn
+        org.nio: debug
+        org.nio.transaction.TranLogger: error
+        org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: ${LOG_CASSANDRA:debug}
+        io.grpc: error
+        reactor.netty: off
+        com.amazon: ${LOG_AWS:debug}
+        software.amazon: ${LOG_AWS:debug}
+        com.datastax: ${LOG_CASSANDRA:debug}
+        web: info
+        root: info
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: [ "*" ]
+    server:
+      port: 8080
+    sqs:
+      region: ap-southeast-1
+      name: nio-lab
+      url: https://sqs.ap-southeast-1.amazonaws.com/730335282524/nio-lab
+    transaction:
+      receive-message-wait-time: 20s
+      buffer-size: 10
+      buffer-time: 50s
+      number-of-messages: 10
   cassandra-application.yaml: |-
-      datastax-java-driver {
-        basic.contact-points.0="10.233.90.132:9042"
-        basic.contact-points.1="10.233.90.134:9042"
-        basic.contact-points.2="10.233.90.145:9042"
-        advanced.auth-provider{
-        class = PlainTextAuthProvider
-        username = "cluster1-superuser"
-        password = "t72v7ioLWEfo7fPbiWfjO1YZ2NWoxxAjLuQaqNdNA8wSbFKicPirjA"
+    datastax-java-driver {
+    basic.contact-points = ["cluster1-dc1-service.database:9042"]
+    advanced.auth-provider {
+    class = PlainTextAuthProvider
+    username = "cluster1-superuser"
+    password = "t72v7ioLWEfo7fPbiWfjO1YZ2NWoxxAjLuQaqNdNA8wSbFKicPirjA"
     }
-        basic.load-balancing-policy {
-        local-datacenter = "dc1"
-        slow-replica-avoidance = false
+    basic.load-balancing-policy {
+    local-datacenter = "dc1"
+    slow-replica-avoidance = false
     }
-        advanced.connection.pool.local.size = 3
+    advanced.connection.pool.local.size = 3
     }
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nio-server
-  namespace: nio-server
+  namespace: nio-lab
   labels:
     app: nio-server
 spec:
@@ -120,10 +145,10 @@ spec:
         - name: nio-server
           image: tiktuzki/nio-server:latest
           imagePullPolicy: Always
-          resources:
-            limits:
-              memory: '1Gi'
-              cpu: '2'
+#          resources:
+#            limits:
+#              memory: '1Gi'
+#              cpu: '2'
           args: [ ]
           env:
             - name: SPRING_PROFILES_ACTIVE

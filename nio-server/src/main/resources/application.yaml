@@ -23,14 +23,14 @@ spring:
       enabled: true
 logging:
   level:
-    org.nio: error
+    org.nio: debug
     org.nio.transaction.TranLogger: error
-    org.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: ${LOG_CASSANDRA:error}
+    ork.springframework.data.cassandra.core.cql.ReactiveCqlTemplate: ${LOG_CASSANDRA:debug}
     io.grpc: error
     reactor.netty: off
-    com.amazon: ${LOG_AWS:info}
-    software.amazon: ${LOG_AWS:info}
-    com.datastax: ${LOG_CASSANDRA:error}
+    com.amazon: ${LOG_AWS:debug}
+    software.amazon: ${LOG_AWS:debug}
+    com.datastax: ${LOG_CASSANDRA:debug}
     web: info
     root: info
 management:
