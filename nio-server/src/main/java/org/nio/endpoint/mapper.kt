@@ -1,7 +1,7 @@
 package org.nio.endpoint
 
-import com.nio.wallet.grpc.WalletServiceOuterClass.AccountData
-import com.nio.wallet.grpc.WalletServiceOuterClass.CreateAccountRequest
+import com.nio.wallet.grpc.WalletServiceOuterClass.*
+import org.apache.commons.lang3.RandomStringUtils
 import org.nio.account.Account
 import java.util.UUID.randomUUID
 
@@ -18,4 +18,11 @@ fun CreateAccountRequest.of(): Account {
         balance = this.balance.toBigDecimal(),
         version = 1
     )
+}
+
+fun TransferRequest.newInstanceWithSpanId(): TransferRequest {
+    this.toBuilder()
+        .setSpanId(RandomStringUtils.insecure().nextAlphanumeric(16))
+        .build()
+    return this;
 }

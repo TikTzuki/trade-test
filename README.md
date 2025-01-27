@@ -1,3 +1,5 @@
+<img alt="core-algorithm" src="docs/nio-algorithm.png" width="400">
+
 Cassandra CQL
 
 ```bash
@@ -11,29 +13,39 @@ rate(grpc_server_call_duration_seconds_count{grpc_method="com.nio.wallet.grpc.Wa
 ```
 
 ```sql
-select * from system.peers;
-truncate <table_name>;
+select *
+from system.peers;
+truncate < table_name >;
 ```
 
 // CPU tuning
+
 ```bash
 16 cores | 160K 2s | 80K 1.2s | 5K | Need 140 cores
 ```
 
 source_elapsed is the time in microseconds
 
+# Error Handling Strategy
+
+EXECUTE / RETRY or ROLLBACK
+
 # SQS
 
-A queue may still store a message after it has been consumed due to several reasons related to reliability and fault tolerance:
+A queue may still store a message after it has been consumed due to several reasons related to reliability and fault
+tolerance:
 
 1. Acknowledgment Mechanism
    Manual Acknowledgment: The message stays in the queue until the consumer explicitly confirms successful processing.
-   Automatic Acknowledgment: If enabled, the message is removed after being delivered, but in some systems, it remains until processing is confirmed.
+   Automatic Acknowledgment: If enabled, the message is removed after being delivered, but in some systems, it remains
+   until processing is confirmed.
 2. Message Visibility Timeout (Temporary Lock)
-   In systems like Amazon SQS, when a consumer picks up a message, it becomes invisible for a period (visibility timeout).
+   In systems like Amazon SQS, when a consumer picks up a message, it becomes invisible for a period (visibility
+   timeout).
    If the consumer fails to process it within that time, the message becomes visible again for reprocessing.
 3. Dead-Letter Queue (DLQ)
-   If a message fails to be processed after several attempts, it may be moved to a DLQ for debugging or further analysis.
+   If a message fails to be processed after several attempts, it may be moved to a DLQ for debugging or further
+   analysis.
    Until then, it can remain in the main queue.
 4. Durability and Persistence
    For durability, messages are sometimes stored persistently (disk/database) until successful processing is confirmed.

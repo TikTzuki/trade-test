@@ -66,10 +66,10 @@ class TestController @Autowired constructor(
 
     @PostMapping("/bulk-transfers", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun bulkTransfers(
-        @RequestParam parallel: Int,
-        @RequestParam userCount: Int,
-        @RequestParam transactionPerUser: Int,
-        @RequestParam enableStream: Boolean,
+        @RequestParam(defaultValue = "1") parallel: Int,
+        @RequestParam(required = false) userCount: Long?,
+        @RequestParam(defaultValue = "1") transactionPerUser: Int,
+        @RequestParam(defaultValue = "true") enableStream: Boolean,
         @RequestPart("file")
         fileFlux: FilePart
     ): String {
@@ -77,10 +77,10 @@ class TestController @Autowired constructor(
             .map { buffer ->
                 buffer.asInputStream(true)
                     .bufferedReader().use { reader ->
-                        reader.readLines()
+                        reader.readLines().stream().limit(userCount ?: Long.MAX_VALUE).toList()
                     }
             }.block()!!
-        workerService.startRun(accountIds, parallel, userCount, transactionPerUser, enableStream)
+        workerService.startRun(accountIds, parallel, transactionPerUser, enableStream)
         return "Bulk Transfer!"
     }
 

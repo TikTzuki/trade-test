@@ -31,7 +31,6 @@ class GrpcWorkerService @Autowired constructor(
     fun startRun(
         accountIds: List<String>,
         parallel: Int,
-        userCount: Int,
         transPerUser: Int,
         enableStream: Boolean
     ) {
@@ -39,80 +38,54 @@ class GrpcWorkerService @Autowired constructor(
             stopRun()
         executorService = Executors.newSingleThreadScheduledExecutor()
         executorService.scheduleAtFixedRate({
-            if (enableStream)
-                transferStream(accountIds, parallel, userCount, transPerUser)
-//            else
-//                transfer(accountIds, userCount, transPerUser)
-
+            transferStream(accountIds, parallel, transPerUser)
         }, 0, 1, TimeUnit.SECONDS)
     }
-
-//    fun transfer(
-//        accountIds: List<String>,
-//        userCount: Int,
-//        transPerUser: Int
-//    ) {
-//        val start = System.currentTimeMillis()
-//        accountIds.toFlux()
-//            .skip(accountIds.size - userCount)
-//            .flatMap { accountId ->
-//                return@flatMap stub.transfer(
-//                    TransferRequest.newBuilder()
-//                        .setUserId(accountId)
-//                        .setAmount("1")
-//                        .setReferenceId(genReferenceId(accountId))
-//                        .build()
-//                )
-//            }
-//            .doOnComplete { logger.info { "Transfer ${userCount * transPerUser} transaction, taken: ${System.currentTimeMillis() - start} ms" } }
-//            .subscribe()
-//    }
 
     fun transferStream(
         accountIds: List<String>,
         parallel: Int,
-        userCount: Int,
         transPerUser: Int
     ) {
-        assert(userCount > accountIds.size) { "User count must be greater than account count" }
-
         val start = System.currentTimeMillis()
-        val accountIds = accountIds.subList(0, userCount);
-        var counter = 0
+        var successCount = 0
+        var failCount = 0;
         accountIds.toFlux()
             .bufferTimeout(ceil(accountIds.size / parallel.toDouble()).toInt(), Duration.ofMillis(1))
             .parallel(parallel)
             .runOn(Schedulers.parallel())
             .flatMap { userAccountIds ->
-                stub.transferStream(accountIdsToTransferRequest(userAccountIds, transPerUser).doOnNext {
-                    logger.debug { it }
-                    counter++
-                })
-                    .onErrorComplete { err ->
+                stub.transferStream(accountIdsToTransferRequest(userAccountIds, transPerUser))
+                    .doOnNext { response ->
+                        if (response.code == 0)
+                            successCount++;
+                        else
+                            failCount++;
+                    }
+                    .onErrorContinue { err, _ ->
                         if (err is StatusRuntimeException) {
                             val error = err.trailers?.get(ProtoUtils.keyForProto(ErrorDetail.getDefaultInstance()))
-                            logger.error("Map error response: ${error?.code} ${error?.message} ${error}")
+                            logger.error("Map error response: ${error?.code} ${error?.message} $error")
                         } else
                             logger.error { "Unhandled error $err" }
-                        true
                     }
             }
-            .doOnComplete { logger.info { "Transfer $counter transaction, taken: ${System.currentTimeMillis() - start} ms" } }
+            .doOnComplete { logger.info { "Transfer $successCount transaction, success ${successCount}, fail ${failCount}, taken: ${System.currentTimeMillis() - start} ms" } }
             .subscribe { }
     }
 
     fun accountIdsToTransferRequest(accountIds: List<String>, transPerUser: Int): Flux<TransferRequest> {
         return accountIds.toFlux()
             .flatMap { accountId ->
-                Mono.just(
-                    TransferRequest.newBuilder()
-                        .setUserId(accountId)
-                        .setAmount("1")
-                )
+                Mono.just(accountIds)
                     .repeat(transPerUser.toLong())
                     .map {
-                        it.setReferenceId(genReferenceId(accountId))
-                        return@map it.build()
+                        val traceId = genReferenceId(accountId);
+                        TransferRequest.newBuilder()
+                            .setTraceId(traceId)
+                            .setUserId(accountId)
+                            .setAmount("1")
+                            .build()
                     }
             }
     }

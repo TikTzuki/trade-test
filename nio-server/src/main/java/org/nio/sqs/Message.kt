@@ -8,21 +8,32 @@ import software.amazon.awssdk.services.sqs.SqsClient
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchResponse
+import java.util.UUID
 
 val logger = KotlinLogging.logger {}
 
-fun SqsClient.publish(msgs: List<TransferRequest>) {
+const val MESSAGE_CONTENT = "messageContent";
+const val TRACE_ID = "traceId";
+const val SPAN_ID = "spanId";
+
+fun SqsClient.publish(msgs: List<TransferRequest>): SendMessageBatchResponse {
     val startBatch = System.currentTimeMillis()
-    val entries = msgs.map {
-        val metadata = MessageAttributeValue.builder()
-            .binaryValue(SdkBytes.fromByteArray(it.toByteArray()))
+    val entries = msgs.map { transaction ->
+        val transactionContent = MessageAttributeValue.builder()
+            .binaryValue(SdkBytes.fromByteArray(transaction.toByteArray()))
             .dataType("Binary")
             .build()
         return@map SendMessageBatchRequestEntry.builder()
-//            .messageGroupId(it.userId)
-            .messageAttributes(mapOf("grpc" to metadata))
-            .id(it.referenceId)
-            .messageBody(it.javaClass.name)
+            .messageAttributes(
+                mapOf(
+                    MESSAGE_CONTENT to transactionContent,
+                    TRACE_ID to MessageAttributeValue.builder().stringValue(transaction.traceId).build(),
+                    SPAN_ID to MessageAttributeValue.builder().stringValue(transaction.spanId).build()
+                )
+            )
+            .id(transaction.referenceId)
+            .messageBody(transaction.referenceId)
             .build()
     }
     logger.debug(
@@ -30,7 +41,7 @@ fun SqsClient.publish(msgs: List<TransferRequest>) {
         System.currentTimeMillis() - startBatch,
         entries.size,
     )
-    this.sendMessageBatch(
+    val batchResponse: SendMessageBatchResponse = this.sendMessageBatch(
         SendMessageBatchRequest.builder()
             .queueUrl(QueueConfig.QUEUE_URL)
             .entries(entries)
@@ -41,4 +52,5 @@ fun SqsClient.publish(msgs: List<TransferRequest>) {
         System.currentTimeMillis() - startBatch,
         entries.size
     )
+    return batchResponse;
 }

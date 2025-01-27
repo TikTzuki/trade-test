@@ -20,13 +20,20 @@
         </rollingPolicy>
     </appender>
     <appender name="DeadLetterLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <filter class="org.nio.transaction.TranLogger"/>
+        <filter class="org.nio.logging.DeadLetterLogger"/>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>%d [%t] %p %C{}: %m%n</Pattern>
+            <Pattern>{
+                "timestamp": "%d{yyyy-MM-dd HH:mm:ss.SSS}",
+                "thread": "%thread",
+                "class": "%logger{40}",
+                "message": "%msg"
+                }
+            </Pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/dead-letter-%d{yyyy-MM-dd-HH}.%i.log</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFileNamingAndTriggeringPolicy">
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFileNamingAndTriggeringPolicy">
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
