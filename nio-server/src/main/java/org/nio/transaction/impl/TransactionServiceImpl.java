@@ -19,7 +19,10 @@ import software.amazon.awssdk.services.sqs.model.SendMessageBatchResponse;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,26 +44,33 @@ public class TransactionServiceImpl {
             .bufferTimeout(10, Duration.ofMillis(1))
             .flatMap(batch -> {
                 SendMessageBatchResponse response = MessageKt.publish(sqsClient, batch);
-                var tranResponses = Flux.empty();
-                var failTrans = Flux.empty();
-                if (response.hasFailed()) {
-                    failTrans = Flux.fromStream(response.failed().stream().map(resp -> {
-                        return TransferResponse.newBuilder()
-                            .setCode(-1)
-                            .build();
-                    }));
-                }
-                return tranResponses;
-                try {
-                } catch (Exception e) {
-                    log.warn("Transfer fail {} {}", batch, e.getMessage());
-                    return Flux.concat(Flux.fromIterable(batch)
-                        .map(it -> Flux.error(new InsertTransactionFail(it.getReferenceId()))));
-                }
-                return Flux.fromIterable(batch);
+                return mapResponse(batch, response);
             })
             .doOnComplete(() -> log.info("Prepare complete: {}", System.currentTimeMillis() - start))
             .thenMany(Flux.empty());
+    }
+    Flux<TransferResponse> mapResponse(List<TransferRequest> batch, SendMessageBatchResponse response) {
+        var batchMap= batch.stream().collect(Collectors.toMap(TransferRequest::getReferenceId, Function.identity()));
+        return Flux.concat(
+            Flux.fromIterable(response.failed()).map(resp->{
+                var request = batchMap.get(resp.id());
+                return TransferResponse.newBuilder()
+                    .setCode(-1)
+                    .setTraceId(request.getTraceId())
+                    .setSpanId(request.getSpanId())
+                    .setReferenceId(request.getReferenceId())
+                    .build();
+            }),
+            Flux.fromIterable(response.successful()).map(resp->{
+                var request = batchMap.get(resp.id());
+                return TransferResponse.newBuilder()
+                    .setCode(0)
+                    .setTraceId(request.getTraceId())
+                    .setSpanId(request.getSpanId())
+                    .setReferenceId(request.getReferenceId())
+                    .build();
+            })
+        );
     }
 
     public Mono<NewTransaction> persistTransaction(TransferRequest request) {
