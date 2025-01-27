@@ -1,6 +1,5 @@
 package org.nio.transaction.impl;
 
-import com.nio.wallet.grpc.WalletServiceOuterClass;
 import com.nio.wallet.grpc.WalletServiceOuterClass.TransferRequest;
 import com.nio.wallet.grpc.WalletServiceOuterClass.TransferResponse;
 import lombok.RequiredArgsConstructor;
@@ -43,17 +42,23 @@ public class TransactionServiceImpl {
         return request
             .bufferTimeout(10, Duration.ofMillis(1))
             .flatMap(batch -> {
-                SendMessageBatchResponse response = MessageKt.publish(sqsClient, batch);
-                return mapResponse(batch, response);
+                try {
+                    SendMessageBatchResponse response = MessageKt.publish(sqsClient, batch);
+                    return mapResponse(batch, response);
+                } catch (Throwable e) {
+                    log.error(e.getMessage(), e);
+                    return Mono.empty();
+                }
             })
-            .doOnComplete(() -> log.info("Prepare complete: {}", System.currentTimeMillis() - start))
-            .thenMany(Flux.empty());
+            .doOnComplete(() -> log.info("Prepare complete: {}", System.currentTimeMillis() - start));
     }
+
     Flux<TransferResponse> mapResponse(List<TransferRequest> batch, SendMessageBatchResponse response) {
-        var batchMap= batch.stream().collect(Collectors.toMap(TransferRequest::getReferenceId, Function.identity()));
+        var batchMap = batch.stream().collect(Collectors.toMap(TransferRequest::getReferenceId, Function.identity()));
         return Flux.concat(
-            Flux.fromIterable(response.failed()).map(resp->{
+            Flux.fromIterable(response.failed()).map(resp -> {
                 var request = batchMap.get(resp.id());
+                log.error("{} {}",request,resp);
                 return TransferResponse.newBuilder()
                     .setCode(-1)
                     .setTraceId(request.getTraceId())
@@ -61,7 +66,7 @@ public class TransactionServiceImpl {
                     .setReferenceId(request.getReferenceId())
                     .build();
             }),
-            Flux.fromIterable(response.successful()).map(resp->{
+            Flux.fromIterable(response.successful()).map(resp -> {
                 var request = batchMap.get(resp.id());
                 return TransferResponse.newBuilder()
                     .setCode(0)
